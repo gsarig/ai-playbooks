@@ -77,6 +77,9 @@ Show the full draft to the user. Ask for corrections or confirmation before writ
 
 ### 5. Write on confirmation
 
-Once the user approves (or after incorporating corrections), write the file to `resources/<filename>.md`.
+Once the user approves (or after incorporating corrections):
+
+1. Write the file to `resources/<filename>.md`
+2. Append a row to `resources/index.md` with the title, verdict, tags, and filename
 
 Confirm the file path after writing.
