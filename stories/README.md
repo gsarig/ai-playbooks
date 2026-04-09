@@ -41,10 +41,10 @@ In Obsidian, go to **Settings → Community plugins → Browse** and install the
 | Plugin | Purpose | Required |
 |--------|---------|----------|
 | [Templater](https://obsidian.md/plugins?id=templater-obsidian) | Auto-applies chapter template when you create a new file in `Chapters/` | Required |
-| [LanguageTool Integration](https://obsidian.md/plugins?id=obsidian-languagetool-plugin) | Grammar and style checking as you write | Required |
-| [Editing Toolbar](https://obsidian.md/plugins?id=editing-toolbar) | Formatting toolbar in the editor | Required |
-| [Smart Typography](https://obsidian.md/plugins?id=obsidian-smart-typography) | Curly quotes, em dashes, ellipsis — auto-converted as you type | Required |
-| [Typing Transformer](https://obsidian.md/plugins?id=typing-transformer-obsidian) | Custom text conversion rules | Required |
+| [LanguageTool Integration](https://obsidian.md/plugins?id=obsidian-languagetool-plugin) | Grammar and style checking as you write | Recommended |
+| [Editing Toolbar](https://obsidian.md/plugins?id=editing-toolbar) | Formatting toolbar in the editor | Recommended |
+| [Smart Typography](https://obsidian.md/plugins?id=obsidian-smart-typography) | Curly quotes, em dashes, ellipsis — auto-converted as you type | Recommended |
+| [Typing Transformer](https://obsidian.md/plugins?id=typing-transformer-obsidian) | Custom text conversion rules | Recommended |
 
 After installing each plugin, enable it. The settings for each plugin are already pre-configured in this vault — no manual setup needed.
 
