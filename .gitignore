@@ -12,6 +12,9 @@
 **/.claude/cache/
 **/.claude/memory/
 
+# IDE files
+.idea/
+
 # OS files
 .DS_Store
 Thumbs.db
