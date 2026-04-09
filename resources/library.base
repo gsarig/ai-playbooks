@@ -1,5 +1,4 @@
 filters: file.inFolder("reviews")
-
 properties:
   title:
     displayName: Title
@@ -11,7 +10,6 @@ properties:
     displayName: Tags
   date_evaluated:
     displayName: Evaluated
-
 views:
   - type: table
     name: All Resources

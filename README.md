@@ -34,7 +34,7 @@ Each playbook's `README.md` lists any additional plugins required.
 
 ## evaluate-resource skill
 
-The repo ships with an `/evaluate-resource` skill. Drop a URL into the chat with any evaluative phrase ("what do you think", "evaluate this") and it will spawn an Opus subagent, draft a structured evaluation, present it for your approval, then write the file to `resources/` and update the index.
+The repo ships with an `/evaluate-resource` skill. Drop a URL into the chat with any evaluative phrase ("what do you think", "evaluate this") and it will spawn an Opus subagent, draft a structured evaluation, present it for your approval, then write the file to `resources/reviews/`.
 
 The skill is designed to be portable — you can use it in any project with your own context:
 

@@ -4,9 +4,9 @@ A scaffold for building a personal curated library of evaluated methodologies, w
 
 ## What you get
 
-- An `/evaluate-resource` skill that fetches any URL, drafts a structured evaluation via an Opus subagent, and writes the result to `resources/` after your approval
+- An `/evaluate-resource` skill that fetches any URL, drafts a structured evaluation via an Opus subagent, and writes the result to `resources/reviews/` after your approval
 - A verdict taxonomy (`adopt`, `adapt`, `watch`, `catalog`, `skip`) with documented reasoning
-- An Obsidian vault in `resources/` with a Dataview dashboard that automatically groups entries by verdict
+- An Obsidian vault in `resources/` with a Bases view that automatically groups entries by verdict — no plugins required
 
 ## Setup
 
@@ -17,7 +17,7 @@ A scaffold for building a personal curated library of evaluated methodologies, w
    - Fill in your vault setup, tools, and preferences — or point to a file in your dotfiles
    - The skill uses this to calibrate its judgment about conditions for fit
 
-3. **Open `resources/` as an Obsidian vault** and install the Dataview community plugin — the `_index.md` dashboard uses it to build verdict-grouped tables from file frontmatter automatically
+3. **Open `resources/` as an Obsidian vault** — the `_index.md` home note embeds a Bases view that groups entries by verdict automatically
 
 4. **Drop a URL in the chat** with any evaluative phrase ("what do you think", "evaluate this", "is this worth adopting") — the skill triggers automatically
 
@@ -25,8 +25,10 @@ A scaffold for building a personal curated library of evaluated methodologies, w
 
 ```
 .claude/skills/evaluate-resource/   — the evaluation skill
-resources/                          — evaluated entries (one file each)
-resources/_index.md                 — Dataview dashboard (auto-maintained)
+resources/                          — vault root
+resources/_index.md                 — home note, embeds the Bases view
+resources/library.base              — Bases view grouped by verdict
+resources/reviews/                  — evaluation files (one per resource)
 resources/README.md                 — evaluation perspective and verdict definitions
 CLAUDE.md                           — auto-trigger rule for evaluative intent
 ```

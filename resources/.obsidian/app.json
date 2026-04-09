@@ -1,5 +1,6 @@
 {
-  "propertiesInDocument": "hidden",
+  "propertiesInDocument": "visible",
   "alwaysUpdateLinks": true,
-  "strictLineBreaks": false
+  "strictLineBreaks": false,
+  "defaultViewMode": "preview"
 }

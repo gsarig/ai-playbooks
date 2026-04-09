@@ -26,7 +26,7 @@ The [`evaluate-resource`](../.claude/skills/evaluate-resource/) skill is what pr
 2. Fill in your own vault or project context, or point to a file in your dotfiles
 3. Drop a URL in the chat with any evaluative phrase ("what do you think", "evaluate this") and the skill triggers automatically
 
-Evaluations are drafted by an Opus subagent, presented for your approval, then written to `resources/` and added to the index. The skill does not write anything without confirmation.
+Evaluations are drafted by an Opus subagent, presented for your approval, then written to `resources/reviews/`. The skill does not write anything without confirmation.
 
 ## Index
 
