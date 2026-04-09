@@ -18,3 +18,6 @@ Thumbs.db
 
 # Personal story content — only the skeleton is tracked, not actual stories
 # Add specific story folder names here when needed
+
+# Personal skill context — copy context.example.md to context.md and fill it in
+.claude/skills/*/context.md

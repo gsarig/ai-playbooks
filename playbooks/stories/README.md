@@ -32,7 +32,7 @@ Download or clone this repository. Open the `stories/` folder as an Obsidian vau
 
 - Launch Obsidian
 - Click **Open folder as vault**
-- Select the `stories/` folder
+- Select the `stories/` folder inside `playbooks/`
 
 ### Step 2 — Install community plugins
 
