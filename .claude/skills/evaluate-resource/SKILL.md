@@ -85,8 +85,8 @@ Show the full draft to the user. Ask for corrections or confirmation before writ
 
 Once the user approves (or after incorporating corrections):
 
-1. Write the file to `resources/<filename>.md`
+1. Write the file to `resources/reviews/<filename>.md`
 
-The `resources/_index.md` is maintained automatically by Dataview — no manual update needed.
+The `resources/_index.md` is maintained automatically by Bases — no manual update needed.
 
 Confirm the file path after writing.
