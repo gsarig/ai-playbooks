@@ -42,7 +42,7 @@ title: ""
 url: 
 author: ""
 date_evaluated: YYYY-MM-DD
-verdict: adopt | adapt | skip | watch
+verdict: adopt | adapt | skip | catalog | watch
 tags: []
 ---
 
@@ -52,11 +52,15 @@ tags: []
 
 ## Best used when
 
-[Conditions under which this methodology thrives. Describe in terms of problem types, vault categories, or workflow characteristics — not specific projects.]
+[Conditions under which this thrives. Describe in terms of problem types, vault categories, or workflow characteristics — not specific projects.]
 
 ## Poor fit when
 
 [Conditions under which it breaks down or adds friction without payoff. Be specific about why, not just where.]
+
+## Alternatives
+
+[Only include this section if a better or equivalent option exists. Name the alternative and explain why it is preferable. If this section is present, the verdict should be `skip`.]
 
 ## Verdict
 
@@ -66,7 +70,8 @@ tags: []
 **Verdict definitions:**
 - `adopt` — use this as-is
 - `adapt` — the core idea is sound but needs adjustment for the use case
-- `skip` — not relevant or not worth the cost; document why so the decision isn't revisited
+- `skip` — not worth using: poor quality, overcomplicated, or superseded by a better alternative (document which, and name the alternative in the `## Alternatives` section)
+- `catalog` — good tool in its domain, but out of scope for this project type; no better in-scope alternative identified. Worth knowing about for other contexts.
 - `watch` — promising but not yet ready, mature, or relevant; state what would need to change
 
 **Filename convention:** slugify the title — lowercase, hyphens for spaces, no special characters. Example: `karpathy-llm-wiki-pattern.md`
