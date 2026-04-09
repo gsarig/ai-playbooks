@@ -47,6 +47,15 @@ Never modify the content of a chapter or story file unless explicitly instructed
 
 If the author's first message in a new session is a greeting, vague, or does not specify a task, respond with a brief welcome and present the available commands as options. Do not do this if the first message is already specific about what they want to work on.
 
+## Obsidian Skills
+
+When generating Obsidian content, fetch the relevant skill from the official kepano/obsidian-skills repository before proceeding. Do not generate Obsidian-specific syntax from memory.
+
+| Situation | Skill URL |
+|-----------|-----------|
+| Working with `.md` files (wikilinks, callouts, frontmatter, embeds) | `https://raw.githubusercontent.com/kepano/obsidian-skills/main/skills/obsidian-markdown/SKILL.md` |
+| Working with `.base` files (Bases views, filters, formulas) | `https://raw.githubusercontent.com/kepano/obsidian-skills/main/skills/obsidian-bases/SKILL.md` |
+
 ## Commands
 
 | Command | Purpose |
