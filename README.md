@@ -7,6 +7,7 @@ A collection of standalone workflow blueprints for AI-assisted creative and know
 | Playbook | Description |
 |----------|-------------|
 | [playbooks/stories/](playbooks/stories/) | Fiction writing workflow — novels, novellas, and short stories |
+| [playbooks/resource-library/](playbooks/resource-library/) | Scaffold for a personal evaluated resource library, powered by the evaluate-resource skill |
 
 ## Resources
 
