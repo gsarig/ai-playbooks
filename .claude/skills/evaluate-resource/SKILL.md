@@ -70,7 +70,7 @@ tags: []
 **Verdict definitions:**
 - `adopt` — use this as-is
 - `adapt` — the core idea is sound but needs adjustment for the use case
-- `skip` — not worth using: poor quality, overcomplicated, or superseded by a better alternative (document which, and name the alternative in the `## Alternatives` section)
+- `skip` — not worth using: poor quality, overcomplicated, or superseded by a better alternative. Name the alternative in the `## Alternatives` section.
 - `catalog` — good tool in its domain, but out of scope for this project type; no better in-scope alternative identified. Worth knowing about for other contexts.
 - `watch` — promising but not yet ready, mature, or relevant; state what would need to change
 
