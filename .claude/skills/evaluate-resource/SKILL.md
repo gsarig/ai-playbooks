@@ -1,8 +1,9 @@
-# evaluate-resource
-
-Evaluate an external resource — a methodology, workflow, or pattern — for relevance to this project. Draft a structured evaluation, present it for approval, then write it to `resources/`.
-
 ---
+name: evaluate-resource
+description: Use when the user shares a URL with evaluative intent ("what do you think", "evaluate this", "is this worth adopting", "thoughts on this"), or explicitly invokes /evaluate-resource. Follow all steps in order — do not shortcut based on this description.
+---
+
+# evaluate-resource
 
 ## Steps
 
