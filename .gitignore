@@ -1,0 +1,20 @@
+# Obsidian workspace state (machine-specific)
+**/.obsidian/workspace.json
+**/.obsidian/workspace-mobile.json
+**/.obsidian/cache
+
+# Claude Code local settings (machine-specific permissions)
+**/.claude/settings.local.json
+
+# Claude Code runtime files
+**/.claude/history.jsonl
+**/.claude/sessions/
+**/.claude/cache/
+**/.claude/memory/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Personal story content — only the skeleton is tracked, not actual stories
+# Add specific story folder names here when needed
