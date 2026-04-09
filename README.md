@@ -33,6 +33,12 @@ Each playbook's `README.md` lists any additional plugins required.
 
 ## evaluate-resource skill
 
-The repo ships with an `/evaluate-resource` skill. Point it at any methodology or workflow URL and it will draft a structured evaluation for your review, then store it in `resources/`.
+The repo ships with an `/evaluate-resource` skill. Drop a URL into the chat with any evaluative phrase ("what do you think", "evaluate this") and it will spawn an Opus subagent, draft a structured evaluation, present it for your approval, then write the file to `resources/` and update the index.
 
-See `.claude/skills/evaluate-resource/context.example.md` for how to configure it with your personal vault context.
+The skill is designed to be portable — you can use it in any project with your own context:
+
+1. Copy `.claude/skills/evaluate-resource/context.example.md` to `context.md` in the same folder (it is gitignored)
+2. Fill in your own vault or project context, or point to a file in your dotfiles
+3. Drop a URL in the chat with any evaluative phrase and the skill triggers automatically
+
+The evaluations in this repo reflect a specific setup (see [resources/README.md](resources/README.md)), but the skill itself works for any project. The verdict taxonomy and conditions-for-fit framing are general enough to apply to any domain.
