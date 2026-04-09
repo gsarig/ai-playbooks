@@ -30,4 +30,4 @@ Evaluations are drafted by an Opus subagent, presented for your approval, then w
 
 ## Index
 
-Open [_index.md](_index.md) in Obsidian with the Dataview plugin installed for a browsable, verdict-grouped view. Dataview reads the frontmatter of each entry and builds the tables automatically — no manual maintenance required.
+Open [_index.md](_index.md) in Obsidian for a browsable, verdict-grouped view powered by Bases (a built-in Obsidian feature — no plugins required). New entries appear automatically as their frontmatter is read.

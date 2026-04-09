@@ -1,0 +1,29 @@
+filters:
+  or:
+    - verdict == "adopt"
+    - verdict == "adapt"
+    - verdict == "watch"
+    - verdict == "catalog"
+    - verdict == "skip"
+properties:
+  title:
+    displayName: Title
+  verdict:
+    displayName: Verdict
+  author:
+    displayName: Author
+  tags:
+    displayName: Tags
+  date_evaluated:
+    displayName: Evaluated
+views:
+  - type: table
+    name: All Resources
+    groupBy:
+      property: verdict
+      direction: ASC
+    order:
+      - title
+      - author
+      - tags
+      - date_evaluated

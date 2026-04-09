@@ -20,4 +20,4 @@ When scanning for actionable entries, focus on `adopt`, `adapt`, and `watch`. `c
 
 ## Index
 
-Open `_index.md` in Obsidian (with Dataview installed) for a browsable, verdict-grouped view of all entries.
+Open `_index.md` in Obsidian for a browsable, verdict-grouped view of all entries. The view is powered by Bases, a built-in Obsidian feature — no plugins required.
