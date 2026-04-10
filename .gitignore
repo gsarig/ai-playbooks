@@ -24,3 +24,11 @@ Thumbs.db
 
 # Personal skill context — copy context.example.md to context.md and fill it in
 .claude/skills/*/context.md
+
+# Resource evaluation queue — transient files processed by cron
+resources/tmp/*.md
+!resources/tmp/README.md
+resources/tmp/processed/*
+!resources/tmp/processed/.gitkeep
+resources/tmp/failed/*
+!resources/tmp/failed/.gitkeep
