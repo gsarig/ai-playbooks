@@ -109,6 +109,8 @@ Once the user approves (or after incorporating corrections):
 - **`EXTEND`**: append the `## Related` entry to the existing review at `resources/reviews/<existing-filename>.md`. If a `## Related` section already exists, add the new bullet to it; otherwise add the section at the end of the file.
 - **Full draft**: write the file to `resources/reviews/<filename>.md`.
 
+In both cases, also append a row to `resources/log.md`. For `DUPLICATE`, append the log row but write nothing else.
+
 In all cases (including `DUPLICATE`), append a row to `resources/log.md`:
 
 ```
