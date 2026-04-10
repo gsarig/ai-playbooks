@@ -33,3 +33,7 @@ The key insight is that knowledge is compiled once and kept current, not re-deri
 ## Verdict
 
 Adapt. The core mechanism is genuinely sound and solves a real problem: the maintenance burden that kills personal knowledge bases. For vault types where human-authored content is primary and LLM-generated files are derived artifacts under editorial constraints, the ownership model needs inverting. The three operations (ingest, query, lint) are portable and worth adopting individually. The indexing strategy (flat index.md plus append-only log.md) is practical and worth borrowing directly. The most transferable idea is filing query results back into the wiki — applicable even in vaults the LLM does not own.
+
+## Related
+
+- [@defileo on X](https://x.com/defileo/status/2042241063612502162) — a concrete implementation of this pattern using `claude -p --allowedTools Bash,Write,Read` per operation, making ingest/query/lint scriptable as shell aliases or cron jobs. No new methodology, but a useful confirmation that the pattern runs cleanly on the Claude Code CLI.

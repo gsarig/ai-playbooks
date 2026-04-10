@@ -25,13 +25,27 @@ Use the appropriate tool to retrieve the content at the URL:
 
 Read enough to understand the core methodology or proposal — not just the summary.
 
-### 3. Draft the evaluation using an Opus subagent
+### 3. Check for overlap with existing reviews
+
+Glob `resources/reviews/*.md` and read the `title`, `url`, and `tags` frontmatter fields from each file to build a lightweight index.
+
+- If the URL **exactly matches** an existing entry: stop. The resource is already evaluated. Report this to the user (interactive mode) or log it and exit cleanly (auto mode).
+- If the title or topic looks **substantially similar** to one or more existing entries: read those reviews in full and carry them into step 4. The Opus subagent will assess overlap as part of its work.
+- If nothing looks related: proceed to step 4 with no existing reviews attached.
+
+### 4. Draft the evaluation using an Opus subagent
 
 Spawn an Agent with `model: "opus"` and pass it:
-- The full URL
+- The full URL and fetched content
 - The contents of the context file (if loaded in step 1)
+- Any existing reviews identified as potentially overlapping in step 3
 - The evaluation template below
 - Instruction to return the completed draft as its only output — the agent must NOT write any files
+
+**If overlapping reviews were provided**, the agent must first assess the degree of overlap:
+- **Same core idea, nothing new**: return `DUPLICATE: <existing-filename>` as its entire output. No draft needed.
+- **Same core idea, but adds something worth preserving**: produce a short `## Related` entry (URL + one sentence on what it adds) to be appended to the existing review, prefixed with `EXTEND: <existing-filename>`. Do not produce a full new draft.
+- **Distinct enough to stand alone**: proceed with a full draft as normal.
 
 **Important framing for the agent:** the evaluation lives in a public repo and must be durable across projects. Write entirely in generic terms — problem types, vault categories, workflow patterns. Do not reference specific project names, file paths, or personal setups. Use the personal context only to calibrate judgment (e.g. deciding what "Best used when" conditions are realistic), never to cite it directly.
 
@@ -77,15 +91,20 @@ tags: []
 
 **Filename convention:** slugify the title — lowercase, hyphens for spaces, no special characters. Example: `karpathy-llm-wiki-pattern.md`
 
-### 4. Present for approval
+### 5. Present for approval
 
-Show the full draft to the user. Ask for corrections or confirmation before writing anything.
+Handle the three possible outcomes from step 4:
 
-### 5. Write on confirmation
+- **`DUPLICATE`**: tell the user the resource is already covered by the named review. No further action needed.
+- **`EXTEND`**: show the proposed `## Related` entry and the name of the existing review it would be appended to. Ask for confirmation before writing.
+- **Full draft**: show the complete draft. Ask for corrections or confirmation before writing anything.
+
+### 6. Write on confirmation
 
 Once the user approves (or after incorporating corrections):
 
-1. Write the file to `resources/reviews/<filename>.md`
+- **`EXTEND`**: append the `## Related` entry to the existing review at `resources/reviews/<existing-filename>.md`. If a `## Related` section already exists, add the new bullet to it; otherwise add the section at the end of the file.
+- **Full draft**: write the file to `resources/reviews/<filename>.md`.
 
 The `resources/_index.md` is maintained automatically by Bases — no manual update needed.
 
