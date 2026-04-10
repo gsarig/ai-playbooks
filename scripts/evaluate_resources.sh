@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Evaluates URLs queued in resources/tmp/ and writes reviews to resources/reviews/.
-# Safe to call as often as needed (cron runs it hourly).
+# Evaluates URLs queued in ~/resource-tmp/ and writes reviews to resources/reviews/.
+# Safe to call as often as needed (cron runs it hourly; also triggered by inotify watcher).
 
 REPO_DIR="/mnt/d/ai-playbooks"
-TMP_DIR="$REPO_DIR/resources/tmp"
+TMP_DIR="$HOME/resource-tmp"
 LOG="$HOME/resource_evaluator.log"
 CLAUDE="/home/gsarig/.local/bin/claude"
 
