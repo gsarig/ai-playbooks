@@ -25,11 +25,14 @@ Use the appropriate tool to retrieve the content at the URL:
 
 Read enough to understand the core methodology or proposal — not just the summary.
 
-### 3. Check for overlap with existing reviews
+### 3. Check for overlap
 
-Glob `resources/reviews/*.md` and read the `title`, `url`, and `tags` frontmatter fields from each file to build a lightweight index.
+**First**, read `resources/log.md` and check whether the URL appears in it.
 
-- If the URL **exactly matches** an existing entry: stop. The resource is already evaluated. Report this to the user (interactive mode) or log it and exit cleanly (auto mode).
+- If the URL is already in the log: stop. The resource has been processed before. Report the existing outcome to the user (interactive mode) or log and exit cleanly (auto mode). Do not re-evaluate.
+
+**Then**, glob `resources/reviews/*.md` and read the `title`, `url`, and `tags` frontmatter fields from each file to build a lightweight index.
+
 - If the title or topic looks **substantially similar** to one or more existing entries: read those reviews in full and carry them into step 4. The Opus subagent will assess overlap as part of its work.
 - If nothing looks related: proceed to step 4 with no existing reviews attached.
 
@@ -105,6 +108,14 @@ Once the user approves (or after incorporating corrections):
 
 - **`EXTEND`**: append the `## Related` entry to the existing review at `resources/reviews/<existing-filename>.md`. If a `## Related` section already exists, add the new bullet to it; otherwise add the section at the end of the file.
 - **Full draft**: write the file to `resources/reviews/<filename>.md`.
+
+In all cases (including `DUPLICATE`), append a row to `resources/log.md`:
+
+```
+| YYYY-MM-DD | <url> | <outcome> | <notes> |
+```
+
+Where outcome is `reviewed`, `extended`, or `duplicate`, and notes names the relevant file or explains why it was skipped.
 
 The `resources/_index.md` is maintained automatically by Bases — no manual update needed.
 
