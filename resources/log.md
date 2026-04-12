@@ -15,3 +15,9 @@ Every URL that has passed through the evaluation pipeline, regardless of outcome
 | 2026-04-10 | https://github.com/milla-jovovich/mempalace | reviewed | mempalace.md |
 | 2026-04-10 | https://github.com/danielmiessler/Fabric | reviewed | fabric.md |
 | 2026-04-10 | https://github.com/WordPress/agent-skills | reviewed | wordpress-agent-skills.md |
+| 2026-04-11 | https://github.com/breferrari/obsidian-mind | reviewed | obsidian-mind.md |
+| 2026-04-11 | https://github.com/microsoft/markitdown | reviewed | microsoft-markitdown.md |
+| 2026-04-12 | https://github.com/D4Vinci/Scrapling | reviewed | scrapling.md |
+| 2026-04-12 | https://github.com/NousResearch/hermes-agent | reviewed | nous-research-hermes-agent.md |
+| 2026-04-12 | https://github.com/zubair-trabzada/geo-seo-claude | reviewed | geo-seo-claude.md |
+| 2026-04-12 | https://github.com/zubair-trabzada/geo-seo-claude | duplicate | already reviewed as geo-seo-claude.md |
