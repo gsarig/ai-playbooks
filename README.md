@@ -1,4 +1,4 @@
-# ai-playbooks
+# AI Playbooks
 
 A collection of standalone workflow blueprints for AI-assisted creative and knowledge work. Each playbook is a self-contained folder you can use as an Obsidian vault, pre-configured with Claude Code commands, Obsidian settings, and plugin configurations.
 
