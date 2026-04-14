@@ -1,0 +1,5 @@
+.markdown-rendered img,
+.markdown-preview-view img {
+  max-width: 600px !important;
+  max-height: 600px !important;
+}

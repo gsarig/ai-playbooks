@@ -1,0 +1,7 @@
+{
+  "defaultViewMode": "preview",
+  "userIgnoreFilters": [
+    "node_modules",
+    ".env"
+  ]
+}

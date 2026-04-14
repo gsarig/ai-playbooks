@@ -1,0 +1,16 @@
+{
+  "name": "plant-health-tracker",
+  "version": "1.0.0",
+  "description": "AI-powered plant health tracker — scans a staging folder and writes to an Obsidian vault",
+  "type": "module",
+  "main": "src/scan.js",
+  "scripts": {
+    "start": "node src/scan.js",
+    "watch": "node src/scan.js --watch",
+    "rescan": "node src/scan.js --rescan"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "chokidar": "^4.0.3"
+  }
+}

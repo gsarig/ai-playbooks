@@ -1,0 +1,8 @@
+{
+  "cssTheme": "Kakano",
+  "theme": "moonstone",
+  "accentColor": "#6b9446",
+  "enabledCssSnippets": [
+    "plant-images"
+  ]
+}
