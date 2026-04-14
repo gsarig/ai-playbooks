@@ -31,6 +31,9 @@ All playbooks require:
 - [Obsidian](https://obsidian.md) — free note-taking app
 - [Claude Code](https://claude.ai/code) — Anthropic's AI coding assistant (also works for writing)
 
+Optional, for the resource library workflow:
+- [Obsidian Web Clipper](https://obsidian.md/clipper) — browser extension to clip web pages directly into your vault
+
 Each playbook's `README.md` lists any additional plugins required.
 
 ## evaluate-resource skill

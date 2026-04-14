@@ -70,6 +70,11 @@ function slug(id: string) {
       </div>
     </div>
 
+    <div class="playbook-links">
+      <a href="https://github.com/gsarig/ai-playbooks/blob/main/playbooks/resource-library/.claude/skills/evaluate-resource/SKILL.md" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">View the skill</a>
+      <a href="https://github.com/gsarig/ai-playbooks/tree/main/playbooks/resource-library" target="_blank" rel="noopener noreferrer" class="btn btn-primary">View the playbook</a>
+    </div>
+
     {VERDICT_ORDER.filter(v => grouped[v].length > 0).map(v => (
       <section class="verdict-group">
         <div class="section-heading">

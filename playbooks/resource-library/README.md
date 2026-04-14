@@ -2,6 +2,12 @@
 
 A scaffold for building a personal curated library of evaluated methodologies, workflows, and patterns — powered by Claude Code and browsable in Obsidian.
 
+## Requirements
+
+- [Obsidian](https://obsidian.md) — free, available on Windows, macOS, Linux, iOS, Android
+- [Claude Code](https://claude.ai/code) — Anthropic's AI CLI
+- [Obsidian Web Clipper](https://obsidian.md/clipper) — browser extension for clipping resources into your inbox (optional, but the intended way to feed the workflow)
+
 ## What you get
 
 - An `/evaluate-resource` skill that fetches any URL, drafts a structured evaluation via an Opus subagent, and writes the result to `resources/reviews/` after your approval
@@ -32,6 +38,25 @@ resources/reviews/                  — evaluation files (one per resource)
 resources/README.md                 — evaluation perspective and verdict definitions
 CLAUDE.md                           — auto-trigger rule for evaluative intent
 ```
+
+## Setting up Obsidian Web Clipper
+
+Web Clipper is the browser extension that feeds the workflow. When you find something worth evaluating, you clip it from the browser and it lands in your vault's inbox — ready for the cron job or Claude Code to pick up.
+
+1. **Install the extension** — go to [obsidian.md/clipper](https://obsidian.md/clipper) and install it for your browser (Chrome, Firefox, Safari, or Edge)
+
+2. **Connect it to your vault** — open the extension settings and select your vault from the list. Obsidian must be running at least once beforehand for the vault to appear.
+
+3. **Set the destination folder** — in the extension settings, set the default save location to your inbox folder (e.g. `resources/tmp`). This is the folder the cron job or Claude Code watches for new clips.
+
+4. **Set the note format** — the default template works fine. You can optionally add a `url` property to the frontmatter template so the evaluation skill can pick it up automatically:
+   ```
+   url: {{url}}
+   ```
+
+5. **Clip something** — navigate to any page you want to evaluate, click the extension icon, and hit save. The page content lands in your inbox as a markdown file.
+
+From there, either trigger Claude Code manually (`evaluate this`) or let the cron job handle it automatically.
 
 ## Customising the evaluation lens
 
