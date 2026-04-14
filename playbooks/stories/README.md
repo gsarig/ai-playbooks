@@ -38,17 +38,24 @@ Download or clone this repository. Open the `stories/` folder as an Obsidian vau
 
 In Obsidian, go to **Settings → Community plugins → Browse** and install the following:
 
-| Plugin | Purpose | Required |
-|--------|---------|----------|
-| [Templater](https://obsidian.md/plugins?id=templater-obsidian) | Auto-applies chapter template when you create a new file in `Chapters/` | Required |
-| [LanguageTool Integration](https://obsidian.md/plugins?id=obsidian-languagetool-plugin) | Grammar and style checking as you write | Recommended |
-| [Editing Toolbar](https://obsidian.md/plugins?id=editing-toolbar) | Formatting toolbar in the editor | Recommended |
-| [Smart Typography](https://obsidian.md/plugins?id=obsidian-smart-typography) | Curly quotes, em dashes, ellipsis — auto-converted as you type | Recommended |
-| [Typing Transformer](https://obsidian.md/plugins?id=typing-transformer-obsidian) | Custom text conversion rules | Recommended |
+| Plugin | What it enables | Required |
+|--------|----------------|----------|
+| [Templater](https://obsidian.md/plugins?id=templater-obsidian) | Auto-applies the chapter template (with auto-numbered filename) whenever you create a new file in `Chapters/` | Required |
+| [LanguageTool Integration](https://obsidian.md/plugins?id=obsidian-languagetool-plugin) | Live grammar and style checking as you write; set your native language for second-language support | Recommended |
+| [Editing Toolbar](https://obsidian.md/plugins?id=editing-toolbar) | Floating formatting toolbar; pre-configured with text, list, alignment, and insert commands | Recommended |
+| [Smart Typography](https://obsidian.md/plugins?id=obsidian-smart-typography) | Converts straight quotes to curly, double-dash to em dash, and triple-dot to ellipsis as you type | Recommended |
+| [Typing Transformer](https://obsidian.md/plugins?id=typing-transformer-obsidian) | Custom keystroke shortcuts; pre-configured with `***` → scene-break divider (`✽✽✽`) and other writing shortcuts | Recommended |
+| [Better Word Count](https://obsidian.md/plugins?id=better-word-count) | Status bar showing word count and page count (at 300 words/page); replaces Obsidian's built-in word count | Recommended |
+| [Iconize](https://obsidian.md/plugins?id=obsidian-icon-folder) | Adds icons to folders and files in the sidebar; pre-configured for `_Archive`, `_Templates`, `_Ideas`, `_Commands`, and `_Dashboard` | Recommended |
+| [Outliner](https://obsidian.md/plugins?id=obsidian-outliner) | Improves list behaviour: better Tab/Enter handling, drag-and-drop reordering, cursor stays on bullet | Recommended |
+| [Advanced Cursors](https://obsidian.md/plugins?id=advanced-cursors) | Multi-cursor support; adds Cmd/Ctrl+D to select and edit the next matching word — useful for renaming within a chapter | Recommended |
+| [Pandoc Plugin](https://obsidian.md/plugins?id=obsidian-pandoc) | Export your story to DOCX, PDF, EPUB, and other formats directly from Obsidian | Recommended |
 
 After installing each plugin, enable it. The settings for each plugin are already pre-configured in this vault — no manual setup needed.
 
 > **LanguageTool:** If you write in English as a second language, go to **Settings → LanguageTool Integration** and set your native language in the **Mother tongue** field. This helps the plugin distinguish errors from stylistic choices.
+
+> **Pandoc Plugin:** This plugin requires [Pandoc](https://pandoc.org/installing.html) to be installed on your system separately. Install Pandoc first, then install the Obsidian plugin. Once set up, use it to export finished chapters or full manuscripts to DOCX (for editors), EPUB (for ebook distribution), or PDF.
 
 ### Step 3 — Configure Claude Code
 
@@ -103,6 +110,7 @@ Claude will ask whether you want to scaffold from an idea in `_Ideas.md`, start 
 stories/
 ├── CLAUDE.md               Global writing rules for Claude
 ├── _Commands.md            Quick reference for all slash commands
+├── _Dashboard.base         Story tracker — Active, In Revision, Completed, Abandoned
 ├── _Ideas.md               Idea scratchpad — source for /new-story
 ├── _Templates/             Obsidian templates (auto-applied by Templater)
 ├── _Archive/               Completed and abandoned stories

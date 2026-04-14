@@ -1,0 +1,46 @@
+filters:
+  and:
+    - file.hasTag("story-index")
+views:
+  - type: table
+    name: Active Stories
+    filters:
+      and:
+        - status == "active"
+    order:
+      - file.name
+      - genre
+      - length
+      - status
+      - started
+      - target_wordcount
+  - type: table
+    name: In Revision
+    filters:
+      and:
+        - status == "revision"
+    order:
+      - file.name
+      - genre
+      - length
+      - started
+  - type: table
+    name: Completed
+    filters:
+      and:
+        - status == "complete"
+    order:
+      - file.name
+      - genre
+      - length
+      - started
+  - type: table
+    name: Abandoned
+    filters:
+      and:
+        - status == "abandoned"
+    order:
+      - file.name
+      - genre
+      - length
+      - started

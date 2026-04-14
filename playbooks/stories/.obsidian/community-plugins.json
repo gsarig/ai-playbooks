@@ -3,5 +3,10 @@
   "obsidian-languagetool-plugin",
   "editing-toolbar",
   "obsidian-smart-typography",
-  "typing-transformer-obsidian"
+  "typing-transformer-obsidian",
+  "better-word-count",
+  "obsidian-icon-folder",
+  "obsidian-outliner",
+  "obsidian-pandoc",
+  "advanced-cursors"
 ]
