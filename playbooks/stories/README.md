@@ -116,20 +116,29 @@ stories/
 ├── _Archive/               Completed and abandoned stories
 │   ├── Completed/
 │   └── Abandoned/
-└── {Story Title}/          Created by /new-story
-    ├── _Index.md           Story premise, themes, open questions
-    ├── _Lore.md            Detailed worldbuilding — rules, cosmology, factions
-    ├── _Lines.md           Reserved lines to place later in the draft
-    ├── CLAUDE.md           Story-specific rules (overrides vault CLAUDE.md)
-    ├── Timeline.md         Event tracking
+│
+├── My Novel/               Novel or novella — created by /new-story
+│   ├── _Index.md           Story premise, themes, open questions
+│   ├── _Lore.md            Detailed worldbuilding — rules, cosmology, factions
+│   ├── _Lines.md           Reserved lines to place later in the draft
+│   ├── CLAUDE.md           Story-specific rules (overrides vault CLAUDE.md)
+│   ├── Timeline.md         Event tracking
+│   ├── Quicknotes.md       Working notes and fragments
+│   ├── Chapters/           One file per chapter (ch-01.md, ch-02.md, …)
+│   ├── _Characters/        One file per character
+│   │   └── _Index.md       Character roster and Bases view guidance
+│   ├── _Locations/         One file per location
+│   │   └── _Index.md       Location roster and Bases view guidance
+│   ├── _Research/          Reference material
+│   └── _Assets/            Cover images and design files
+│
+└── My Short Story/         Short story — leaner structure
+    ├── _Index.md           Story premise and open questions
+    ├── CLAUDE.md           Story-specific rules
     ├── Quicknotes.md       Working notes and fragments
-    ├── Chapters/           One file per chapter (ch-01.md, ch-02.md, …)
-    ├── _Characters/        One file per character
-    │   └── _Index.md       Character roster and Bases view guidance
-    ├── _Locations/         One file per location
-    │   └── _Index.md       Location roster and Bases view guidance
-    ├── _Research/          Reference material
-    └── _Assets/            Cover images and design files
+    ├── my-short-story.md   The story itself (single file)
+    └── _Characters/        Optional — only if the cast needs tracking
+        └── _Index.md
 ```
 
 ---
