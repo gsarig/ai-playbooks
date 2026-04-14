@@ -19,6 +19,11 @@
 .DS_Store
 Thumbs.db
 
+# Astro site build artefacts
+site/node_modules/
+site/dist/
+site/.astro/
+
 # Personal story content — only the skeleton is tracked, not actual stories
 # Add specific story folder names here when needed
 

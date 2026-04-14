@@ -1,0 +1,41 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'A curated library of evaluated AI methodologies, workflows, and tools.' } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="site-title">AI Playbooks — Resource Library</a>
+      <span class="site-tagline">Evaluated methodologies, workflows, and tools</span>
+    </div>
+  </header>
+
+  <main>
+    <slot />
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      Verdicts: <strong>adopt</strong> — use as-is &middot;
+      <strong>adapt</strong> — sound idea, needs adjustment &middot;
+      <strong>watch</strong> — promising, not yet ready &middot;
+      <strong>catalog</strong> — good tool, out of scope &middot;
+      <strong>skip</strong> — not worth it
+    </div>
+  </footer>
+</body>
+</html>

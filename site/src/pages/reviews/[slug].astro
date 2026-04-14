@@ -1,0 +1,46 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const reviews = await getCollection('reviews');
+  return reviews.map(review => ({
+    params: { slug: review.id.replace(/\.mdx?$/, '') },
+    props: { review },
+  }));
+}
+
+const { review } = Astro.props;
+const { Content } = await render(review);
+
+const { title, url, author, date_evaluated, verdict, tags } = review.data;
+
+function formatDate(d: Date) {
+  return d.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+---
+<Base title={`${title} — Resource Library`} description={`${verdict} — ${tags.join(', ')}`}>
+  <div class="container">
+    <div class="review-header">
+      <div class="review-nav">
+        <a href="/">← All resources</a>
+      </div>
+      <h1 class="review-title">{title}</h1>
+      <div class="review-meta">
+        <span class={`verdict verdict-${verdict}`}>{verdict}</span>
+        <span class="sep">·</span>
+        <a href={url} target="_blank" rel="noopener noreferrer">{url}</a>
+        <span class="sep">·</span>
+        <span>by {author}</span>
+        <span class="sep">·</span>
+        <span>Evaluated {formatDate(date_evaluated)}</span>
+        <div class="tags" style="width:100%; margin-top:0.5rem">
+          {tags.map(tag => <span class="tag">{tag}</span>)}
+        </div>
+      </div>
+    </div>
+    <div class="prose">
+      <Content />
+    </div>
+  </div>
+</Base>

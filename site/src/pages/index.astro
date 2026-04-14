@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+
+const allReviews = await getCollection('reviews');
+
+const VERDICT_ORDER = ['adopt', 'adapt', 'watch', 'catalog', 'skip'] as const;
+type Verdict = typeof VERDICT_ORDER[number];
+
+const VERDICT_LABEL: Record<Verdict, string> = {
+  adopt:   'Adopt',
+  adapt:   'Adapt',
+  watch:   'Watch',
+  catalog: 'Catalog',
+  skip:    'Skip',
+};
+
+const grouped = VERDICT_ORDER.reduce((acc, v) => {
+  acc[v] = allReviews
+    .filter(r => r.data.verdict === v)
+    .sort((a, b) => b.data.date_evaluated.getTime() - a.data.date_evaluated.getTime());
+  return acc;
+}, {} as Record<Verdict, typeof allReviews>);
+
+function formatDate(d: Date) {
+  return d.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function slug(id: string) {
+  return id.replace(/\.mdx?$/, '');
+}
+---
+<Base title="Resource Library">
+  <div class="container">
+    {VERDICT_ORDER.filter(v => grouped[v].length > 0).map(v => (
+      <section class="verdict-group">
+        <div class="section-heading">
+          <span class={`verdict verdict-${v}`}>{VERDICT_LABEL[v]}</span>
+          <h2>{grouped[v].length} {grouped[v].length === 1 ? 'entry' : 'entries'}</h2>
+        </div>
+        <div class="cards">
+          {grouped[v].map(review => (
+            <a href={`/reviews/${slug(review.id)}`} class="card">
+              <div>
+                <div class="card-title">{review.data.title}</div>
+                <div class="card-meta">by {review.data.author}</div>
+                <div class="tags">
+                  {review.data.tags.map(tag => <span class="tag">{tag}</span>)}
+                </div>
+              </div>
+              <div class="card-date">{formatDate(review.data.date_evaluated)}</div>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</Base>

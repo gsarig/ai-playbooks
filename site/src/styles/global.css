@@ -1,0 +1,281 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg:       #f9f9f7;
+  --color-surface:  #ffffff;
+  --color-border:   #e8e8e4;
+  --color-text:     #1c1c1a;
+  --color-muted:    #6b6b65;
+  --color-link:     #2c5f2e;
+
+  --verdict-adopt:   #2c5f2e;
+  --verdict-adapt:   #1a5276;
+  --verdict-watch:   #7d5a00;
+  --verdict-catalog: #5b3d8a;
+  --verdict-skip:    #7a2929;
+
+  --radius: 6px;
+  --max-w: 860px;
+}
+
+html { font-size: 16px; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.65;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+a:hover { opacity: 0.75; }
+
+/* ── Layout ──────────────────────────────────────────────── */
+
+.container {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ── Site header ─────────────────────────────────────────── */
+
+.site-header {
+  border-bottom: 1px solid var(--color-border);
+  padding: 1.25rem 0;
+  margin-bottom: 3rem;
+}
+
+.site-header .container {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.site-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.site-title:hover { opacity: 0.75; }
+
+.site-tagline {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+/* ── Verdict badge ───────────────────────────────────────── */
+
+.verdict {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.2em 0.6em;
+  border-radius: 3px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.verdict-adopt   { background: var(--verdict-adopt); }
+.verdict-adapt   { background: var(--verdict-adapt); }
+.verdict-watch   { background: var(--verdict-watch); }
+.verdict-catalog { background: var(--verdict-catalog); }
+.verdict-skip    { background: var(--verdict-skip); }
+
+/* ── Tags ────────────────────────────────────────────────── */
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tag {
+  font-size: 0.72rem;
+  background: var(--color-border);
+  color: var(--color-muted);
+  padding: 0.2em 0.55em;
+  border-radius: 3px;
+}
+
+/* ── Index: section heading ──────────────────────────────── */
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.section-heading h2 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.section-heading .verdict { vertical-align: middle; }
+
+.verdict-group {
+  margin-bottom: 3rem;
+}
+
+/* ── Card ────────────────────────────────────────────────── */
+
+.cards {
+  display: grid;
+  gap: 1px;
+  background: var(--color-border);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.card {
+  background: var(--color-surface);
+  padding: 1.1rem 1.25rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.25rem 1rem;
+  align-items: start;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.1s;
+}
+
+.card:hover { background: #f4f4f1; }
+
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.card-meta {
+  font-size: 0.78rem;
+  color: var(--color-muted);
+  margin-top: 0.2rem;
+}
+
+.card .tags {
+  margin-top: 0.5rem;
+  grid-column: 1 / -1;
+}
+
+.card-date {
+  font-size: 0.78rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+  padding-top: 0.2rem;
+}
+
+/* ── Review page ─────────────────────────────────────────── */
+
+.review-header {
+  margin-bottom: 2.5rem;
+}
+
+.review-nav {
+  font-size: 0.82rem;
+  color: var(--color-muted);
+  margin-bottom: 1.5rem;
+}
+
+.review-nav a { color: var(--color-muted); }
+
+.review-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 1rem;
+}
+
+.review-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: var(--color-muted);
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.review-meta a {
+  color: var(--color-muted);
+  word-break: break-all;
+}
+
+.review-meta .sep { color: var(--color-border); }
+
+/* ── Prose ───────────────────────────────────────────────── */
+
+.prose {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  max-width: 68ch;
+}
+
+.prose h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 2rem 0 0.6rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.prose h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+.prose p { margin-bottom: 1rem; }
+
+.prose p:last-child { margin-bottom: 0; }
+
+.prose ul, .prose ol {
+  padding-left: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.prose li { margin-bottom: 0.3rem; }
+
+.prose strong { font-weight: 600; }
+
+.prose code {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.85em;
+  background: var(--color-border);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  padding: 1.5rem 0;
+  margin-top: 4rem;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+/* ── Page padding ────────────────────────────────────────── */
+
+main {
+  padding-bottom: 2rem;
+}
