@@ -1,5 +1,7 @@
 # Resource Library Playbook
 
+[![View live site](https://img.shields.io/badge/Live_site-ai--resources.gsarigiannidis.gr-green?style=for-the-badge)](https://ai-resources.gsarigiannidis.gr/)
+
 A scaffold for building a personal curated library of evaluated methodologies, workflows, and patterns — powered by Claude Code and browsable in Obsidian.
 
 ## Requirements
