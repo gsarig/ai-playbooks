@@ -25,7 +25,7 @@ A scaffold for building a personal curated library of evaluated methodologies, w
 
 3. **Open `resources/` as an Obsidian vault** — the `_index.md` home note embeds a Bases view that groups entries by verdict automatically
 
-4. **Evaluations run automatically** — if you have the cron job set up, anything clipped to the inbox is evaluated without you doing anything. Alternatively, drop a URL in the chat with any evaluative phrase ("what do you think", "evaluate this") and the skill triggers on the spot, no clipping needed
+4. **Trigger an evaluation** — either clip a resource to the inbox with Web Clipper and then ask Claude Code to evaluate it, or drop a URL directly in the chat with any evaluative phrase ("what do you think", "evaluate this", "is this worth adopting") — the skill triggers automatically either way
 
 ## Structure
 
@@ -47,7 +47,7 @@ Web Clipper is the browser extension that feeds the workflow. When you find some
 
 2. **Connect it to your vault** — open the extension settings and select your vault from the list. Obsidian must be running at least once beforehand for the vault to appear.
 
-3. **Set the destination folder** — in the extension settings, set the default save location to your inbox folder (e.g. `resources/tmp`). This is the folder the cron job or Claude Code watches for new clips.
+3. **Set the destination folder** — in the extension settings, set the default save location to your inbox folder (e.g. `resources/tmp`). This is the folder Claude Code watches for new clips.
 
 4. **Set the note format** — the default template works fine. You can optionally add a `url` property to the frontmatter template so the evaluation skill can pick it up automatically:
    ```
@@ -56,7 +56,7 @@ Web Clipper is the browser extension that feeds the workflow. When you find some
 
 5. **Clip something** — navigate to any page you want to evaluate, click the extension icon, and hit save. The page content lands in your inbox as a markdown file.
 
-From there, either trigger Claude Code manually (`evaluate this`) or let the cron job handle it automatically.
+From there, open Claude Code and say `evaluate this` — it will find the clipped file and run the evaluation.
 
 ## Customising the evaluation lens
 
