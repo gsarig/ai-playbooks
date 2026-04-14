@@ -16,6 +16,8 @@ Once set up, using it is two steps:
 
 That's it. Claude identifies every plant, matches returning plants against their history, writes a new timeline entry with embedded photos, updates the health trend chart, and regenerates the Dashboard. If a result is uncertain, a warning appears in the Dashboard and the photos are queued for a higher-quality rescan with `npm run rescan`.
 
+![Plant Health Tracker demo](../../assets/plant-tracker.gif)
+
 ---
 
 ## What you get
