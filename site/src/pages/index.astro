@@ -32,6 +32,16 @@ function slug(id: string) {
 ---
 <Base title="Resource Library">
   <div class="container">
+    <div class="intro">
+      <h1 class="intro-title">Resource Library</h1>
+      <p class="intro-body">
+        A curated log of AI tools, methodologies, and patterns — each evaluated for fit
+        against <a href="https://github.com/gsarig" target="_blank" rel="noopener noreferrer">my specific workflow</a> built around Claude Code and Obsidian.
+        Every entry has a verdict and documented reasoning, not just a description.
+        The goal is a record of what was considered and why, not a link dump.
+      </p>
+    </div>
+
     {VERDICT_ORDER.filter(v => grouped[v].length > 0).map(v => (
       <section class="verdict-group">
         <div class="section-heading">

@@ -5,6 +5,24 @@
 }
 
 :root {
+  --color-bg:       #141414;
+  --color-surface:  #1e1e1e;
+  --color-border:   #2e2e2e;
+  --color-text:     #e8e8e4;
+  --color-muted:    #888882;
+  --color-link:     #6db86f;
+
+  --verdict-adopt:   #2d6e30;
+  --verdict-adapt:   #1e5c82;
+  --verdict-watch:   #7a5c00;
+  --verdict-catalog: #5a3d8a;
+  --verdict-skip:    #7a2929;
+
+  --radius: 6px;
+  --max-w: 860px;
+}
+
+[data-theme="light"] {
   --color-bg:       #f9f9f7;
   --color-surface:  #ffffff;
   --color-border:   #e8e8e4;
@@ -17,12 +35,12 @@
   --verdict-watch:   #7d5a00;
   --verdict-catalog: #5b3d8a;
   --verdict-skip:    #7a2929;
-
-  --radius: 6px;
-  --max-w: 860px;
 }
 
-html { font-size: 16px; }
+html {
+  font-size: 16px;
+  color-scheme: dark;
+}
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -57,10 +75,44 @@ a:hover { opacity: 0.75; }
 
 .site-header .container {
   display: flex;
-  align-items: baseline;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.75rem;
   flex-wrap: wrap;
 }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: auto;
+}
+
+.icon-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius);
+  color: var(--color-muted);
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.icon-link:hover {
+  color: var(--color-text);
+  background: var(--color-border);
+  opacity: 1;
+}
+
+/* Show sun in dark mode, moon in light mode */
+.icon-moon { display: none; }
+[data-theme="light"] .icon-sun  { display: none; }
+[data-theme="light"] .icon-moon { display: block; }
 
 .site-title {
   font-size: 1.05rem;
@@ -112,6 +164,27 @@ a:hover { opacity: 0.75; }
   border-radius: 3px;
 }
 
+/* ── Index: intro ────────────────────────────────────────── */
+
+.intro {
+  padding-bottom: 2.5rem;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.intro-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.intro-body {
+  font-size: 0.92rem;
+  color: var(--color-muted);
+  max-width: 60ch;
+  line-height: 1.7;
+}
+
 /* ── Index: section heading ──────────────────────────────── */
 
 .section-heading {
@@ -158,7 +231,7 @@ a:hover { opacity: 0.75; }
   transition: background 0.1s;
 }
 
-.card:hover { background: #f4f4f1; }
+.card:hover { background: var(--color-border); }
 
 .card-title {
   font-size: 0.95rem;
