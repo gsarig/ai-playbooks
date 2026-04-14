@@ -88,7 +88,7 @@ Claude will ask whether you want to scaffold from an idea in `_Ideas.md`, start 
 |---------|---------|
 | `/new-story` | Build a story blueprint from an idea or from scratch |
 | `/continue-story` | Re-entry brief for returning to a story after time away |
-| `/update-chapter ch-XX` | Post-chapter state sync — updates Timeline, Characters, Locations |
+| `/update-chapter ch-XX` | Post-chapter state sync — updates Timeline, Characters, Locations (also works on single-file short stories) |
 | `/dev-edit ch-XX` | Developmental editing pass on a chapter |
 | `/language-edit ch-XX 1\|2\|3` | Language and grammar pass (three passes) |
 | `/audit-story` | Full consistency audit across all chapters |
@@ -102,6 +102,7 @@ Claude will ask whether you want to scaffold from an idea in `_Ideas.md`, start 
 ```
 stories/
 ├── CLAUDE.md               Global writing rules for Claude
+├── _Commands.md            Quick reference for all slash commands
 ├── _Ideas.md               Idea scratchpad — source for /new-story
 ├── _Templates/             Obsidian templates (auto-applied by Templater)
 ├── _Archive/               Completed and abandoned stories
@@ -109,12 +110,16 @@ stories/
 │   └── Abandoned/
 └── {Story Title}/          Created by /new-story
     ├── _Index.md           Story premise, themes, open questions
+    ├── _Lore.md            Detailed worldbuilding — rules, cosmology, factions
+    ├── _Lines.md           Reserved lines to place later in the draft
     ├── CLAUDE.md           Story-specific rules (overrides vault CLAUDE.md)
     ├── Timeline.md         Event tracking
     ├── Quicknotes.md       Working notes and fragments
     ├── Chapters/           One file per chapter (ch-01.md, ch-02.md, …)
     ├── _Characters/        One file per character
+    │   └── _Index.md       Character roster and Bases view guidance
     ├── _Locations/         One file per location
+    │   └── _Index.md       Location roster and Bases view guidance
     ├── _Research/          Reference material
     └── _Assets/            Cover images and design files
 ```

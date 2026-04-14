@@ -43,6 +43,10 @@ Never modify the content of a chapter or story file unless explicitly instructed
 - When uncertain about a world detail, check `_Index.md` before suggesting.
 - If a Character file says a character is dead, do not write them as alive.
 
+## Story Context
+
+Whenever the user references a specific story by name, check whether a folder for that story exists in the vault before responding. If it does, read the story's `CLAUDE.md`, `_Index.md`, and `_Lore.md` in full before engaging with any question about that story. Do not rely on memory or prior context alone.
+
 ## Session Start
 
 If the author's first message in a new session is a greeting, vague, or does not specify a task, respond with a brief welcome and present the available commands as options. Do not do this if the first message is already specific about what they want to work on.
