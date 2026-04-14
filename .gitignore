@@ -5,6 +5,7 @@
 
 # Claude Code local settings (machine-specific permissions)
 **/.claude/settings.local.json
+**/.claude/settings.json
 
 # Claude Code runtime files
 **/.claude/history.jsonl
