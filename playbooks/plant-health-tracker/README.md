@@ -4,6 +4,20 @@ An AI-powered plant health monitor for Obsidian and Claude Code. Drop photos of 
 
 ---
 
+## How it works
+
+Once set up, using it is two steps:
+
+1. **Drop your photos** into the staging folder (a local folder, OneDrive, Dropbox — anything that syncs from your phone works)
+2. **Trigger a scan** — pick whichever mode suits you:
+   - Open Claude Code in the vault folder and say `please scan` — Claude reads the photos directly and writes everything in the conversation, no API key needed
+   - Or run `npm start` from the terminal for a one-shot script scan
+   - Or run `npm run watch` once and leave it running — it fires automatically 2 minutes after your last photo lands
+
+That's it. Claude identifies every plant, matches returning plants against their history, writes a new timeline entry with embedded photos, updates the health trend chart, and regenerates the Dashboard. If a result is uncertain, a warning appears in the Dashboard and the photos are queued for a higher-quality rescan with `npm run rescan`.
+
+---
+
 ## What you get
 
 - **Photo inbox workflow** — drop photos into any folder; the tracker picks them up automatically
