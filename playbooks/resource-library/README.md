@@ -25,7 +25,7 @@ A scaffold for building a personal curated library of evaluated methodologies, w
 
 3. **Open `resources/` as an Obsidian vault** — the `_index.md` home note embeds a Bases view that groups entries by verdict automatically
 
-4. **Drop a URL in the chat** with any evaluative phrase ("what do you think", "evaluate this", "is this worth adopting") — the skill triggers automatically
+4. **Evaluations run automatically** — if you have the cron job set up, anything clipped to the inbox is evaluated without you doing anything. Alternatively, drop a URL in the chat with any evaluative phrase ("what do you think", "evaluate this") and the skill triggers on the spot, no clipping needed
 
 ## Structure
 
