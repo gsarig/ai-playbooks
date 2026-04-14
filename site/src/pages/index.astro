@@ -42,6 +42,34 @@ function slug(id: string) {
       </p>
     </div>
 
+    <div class="how-it-works">
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">1</span>
+            <h3 class="step-title">Clip the resource</h3>
+          </div>
+          <p class="step-desc">Anything worth evaluating gets clipped from the browser using the Obsidian Web Clipper, which drops it into a temporary inbox folder in the vault.</p>
+          <img src="/images/web-clipper.png" alt="Obsidian Web Clipper capturing a resource" class="step-image zoomable" />
+        </div>
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">2</span>
+            <h3 class="step-title">Claude evaluates it</h3>
+          </div>
+          <p class="step-desc">A cron job watches the inbox. When a new clip lands, it triggers a Claude Code agent that reads the resource, applies a structured evaluation framework, and writes a verdict file.</p>
+        </div>
+        <div class="step">
+          <div class="step-header">
+            <span class="step-number">3</span>
+            <h3 class="step-title">Review appears in the vault</h3>
+          </div>
+          <p class="step-desc">The finished evaluation lands in the reviews folder — verdict, reasoning, conditions for fit — ready to read whenever, and automatically published here on the next push.</p>
+          <img src="/images/obsidian-vault.png" alt="Finished review in the Obsidian vault" class="step-image zoomable" />
+        </div>
+      </div>
+    </div>
+
     {VERDICT_ORDER.filter(v => grouped[v].length > 0).map(v => (
       <section class="verdict-group">
         <div class="section-heading">
@@ -65,4 +93,33 @@ function slug(id: string) {
       </section>
     ))}
   </div>
+  <div id="modal" class="modal" aria-hidden="true">
+    <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+    <img id="modal-img" src="" alt="" class="modal-img" />
+  </div>
 </Base>
+
+<script>
+  const modal    = document.getElementById('modal')!;
+  const modalImg = document.getElementById('modal-img') as HTMLImageElement;
+  const closeBtn = document.getElementById('modal-close')!;
+
+  document.querySelectorAll<HTMLImageElement>('.zoomable').forEach(img => {
+    img.style.cursor = 'zoom-in';
+    img.addEventListener('click', () => {
+      modalImg.src = img.src;
+      modalImg.alt = img.alt;
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+    });
+  });
+
+  function closeModal() {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>

@@ -185,6 +185,114 @@ a:hover { opacity: 0.75; }
   line-height: 1.7;
 }
 
+/* ── How it works ────────────────────────────────────────── */
+
+.how-it-works {
+  padding-bottom: 2.5rem;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .steps-grid { grid-template-columns: 1fr; }
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-border);
+  color: var(--color-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.step-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.step-desc {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  line-height: 1.65;
+}
+
+.step-image {
+  margin-top: 0.5rem;
+  max-height: 170px;
+  width: auto;
+  align-self: center;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  opacity: 0.75;
+  transition: opacity 0.2s;
+}
+
+.step-image:hover { opacity: 1; }
+
+/* ── Lightbox ─────────────────────────────────────────────── */
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.modal.is-open { display: flex; }
+
+.modal-img {
+  max-width: 100%;
+  max-height: 90vh;
+  border-radius: var(--radius);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+}
+
+.modal-close {
+  position: fixed;
+  top: 1rem;
+  right: 1.25rem;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+  padding: 0.25rem;
+}
+
+.modal-close:hover { opacity: 1; }
+
 /* ── Index: section heading ──────────────────────────────── */
 
 .section-heading {
