@@ -23,3 +23,4 @@ Every URL that has passed through the evaluation pipeline, regardless of outcome
 | 2026-04-12 | https://github.com/zubair-trabzada/geo-seo-claude | duplicate | already reviewed as geo-seo-claude.md |
 | 2026-04-14 | https://github.com/forrestchang/andrej-karpathy-skills | reviewed | karpathy-derived-claude-code-principles.md |
 | 2026-04-17 | https://blog.cloudflare.com/email-for-agents/ | reviewed | cloudflare-email-service-for-agents.md |
+| 2026-04-18 | https://blog.cloudflare.com/introducing-agent-memory/ | reviewed | cloudflare-agent-memory.md |
