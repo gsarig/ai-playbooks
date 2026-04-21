@@ -9,7 +9,7 @@ A collection of standalone workflow blueprints for AI-assisted creative and know
 | Playbook | Description |
 |----------|-------------|
 | [playbooks/stories/](playbooks/stories/) | Fiction writing workflow — novels, novellas, and short stories |
-| [playbooks/resource-library/](playbooks/resource-library/) | Scaffold for a personal evaluated resource library, powered by the evaluate-resource skill |
+| [playbooks/resource-library/](playbooks/resource-library/) | Scaffold for a personal evaluated resource library, powered by the evaluate-resource skill — [live example](https://ai-resources.gsarigiannidis.gr/) |
 | [playbooks/plant-health-tracker/](playbooks/plant-health-tracker/) | AI-powered plant health monitor — drop photos into a staging folder, get per-plant reports and a live dashboard in Obsidian |
 
 ## Resources
@@ -17,6 +17,8 @@ A collection of standalone workflow blueprints for AI-assisted creative and know
 The [`resources/`](resources/) folder contains evaluated external methodologies and patterns — things worth knowing about, with documented reasoning on whether and how to adopt them. Each entry includes a verdict (`adopt`, `adapt`, `skip`, or `watch`) and the reasoning behind it.
 
 These are not a link dump. The evaluation is the artifact.
+
+Browse the live version at [ai-resources.gsarigiannidis.gr](https://ai-resources.gsarigiannidis.gr/).
 
 ## Philosophy
 
