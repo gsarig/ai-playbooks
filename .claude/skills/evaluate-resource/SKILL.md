@@ -1,6 +1,11 @@
 ---
 name: evaluate-resource
-description: Use when the user shares a URL with evaluative intent ("what do you think", "evaluate this", "is this worth adopting", "thoughts on this"), or explicitly invokes /evaluate-resource. Follow all steps in order — do not shortcut based on this description.
+description: "Evaluates an external resource and writes a structured review with a verdict to resources/reviews/."
+when_to_use: "Use when the user shares a URL with evaluative intent ('what do you think', 'evaluate this', 'is this worth adopting', 'thoughts on this'), or explicitly invokes /evaluate-resource. Follow all steps in order; do not shortcut based on this description."
+argument-hint: "[URL to evaluate]"
+model: opus
+effort: high
+allowed-tools: WebFetch Read Write Bash(gh *) Agent
 ---
 
 # evaluate-resource

@@ -1,6 +1,11 @@
 ---
 name: evaluate-resource-auto
-description: Approval-free variant of evaluate-resource for automated/batch use. Reads a queued file from resources/tmp/, evaluates the URL, writes the review directly, then deletes the source file. On failure, moves the file to resources/tmp/failed/ for manual retry. Invoked by the cron job.
+description: "Approval-free variant of evaluate-resource for automated/batch use: reads a queued file from resources/tmp/, evaluates the URL, writes the review, and cleans up."
+when_to_use: "Use when invoked by the cron job to process a queued file from resources/tmp/. Not for interactive use — use evaluate-resource for manual evaluation instead. Follow all steps in order; do not shortcut based on this description."
+argument-hint: "[path to queued .md file in resources/tmp/]"
+model: opus
+effort: high
+allowed-tools: WebFetch Read Write Bash(gh *) Bash(rm *) Bash(mv *) Agent
 ---
 
 # evaluate-resource-auto
