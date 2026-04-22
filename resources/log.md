@@ -27,3 +27,6 @@ Every URL that has passed through the evaluation pipeline, regardless of outcome
 | 2026-04-19 | https://github.com/addyosmani/agent-skills | reviewed | addyosmani-agent-skills.md |
 | 2026-04-21 | https://www.xda-developers.com/claude-codes-creator-keeps-sharing-tips-and-they-all-made-my-experience-better/ | reviewed | boris-cherny-claude-code-tips.md |
 | 2026-04-21 | https://joost.blog/self-updating-agent-skills/ | reviewed | how-i-made-my-skills-update-themselves.md |
+| 2026-04-21 | https://github.com/browser-use/video-use | reviewed | video-use-edit-videos-with-claude-code.md |
+| 2026-04-22 | https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-design-md/ | reviewed | design-md-specification.md |
+| 2026-04-22 | https://claude.com/blog/the-advisor-strategy | reviewed | the-advisor-strategy.md |
