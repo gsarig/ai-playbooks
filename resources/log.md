@@ -30,3 +30,6 @@ Every URL that has passed through the evaluation pipeline, regardless of outcome
 | 2026-04-21 | https://github.com/browser-use/video-use | reviewed | video-use-edit-videos-with-claude-code.md |
 | 2026-04-22 | https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-design-md/ | reviewed | design-md-specification.md |
 | 2026-04-22 | https://claude.com/blog/the-advisor-strategy | reviewed | the-advisor-strategy.md |
+| 2026-04-22 | https://github.com/ComposioHQ/awesome-claude-skills | reviewed | composiohq-awesome-claude-skills.md |
+| 2026-04-22 | https://github.com/cytostack/openwolf | reviewed | openwolf-a-second-brain-for-claude-code.md |
+| 2026-04-22 | https://github.com/gsd-build/get-shit-done | reviewed | get-shit-done-gsd.md |
