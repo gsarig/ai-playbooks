@@ -1,0 +1,61 @@
+filters:
+  and:
+    - file.inFolder("TV Shows")
+    - file.basename != "_Standout Episodes"
+    - next_season_date >= today()
+formulas:
+  days_until: if(next_season_date, (date(next_season_date) - today()).days, "")
+properties:
+  next_season_start:
+    displayName: Starts
+  next_season_date:
+    displayName: Finale
+  current_season:
+    displayName: Season
+  last_season_watched:
+    displayName: Up To
+  series_status:
+    displayName: Series
+  imdb_url:
+    displayName: URL
+  my_rating:
+    displayName: My Rating
+  status:
+    displayName: Watch Status
+  formula.days_until:
+    displayName: Days
+views:
+  - type: table
+    name: Coming Soon
+    filters:
+      and:
+        - status == "watching"
+    order:
+      - file.name
+      - imdb_url
+      - current_season
+      - last_season_watched
+      - next_season_start
+      - next_season_date
+      - formula.days_until
+      - series_status
+      - status
+      - my_rating
+    sort:
+      - property: formula.days_until
+        direction: ASC
+  - type: table
+    name: Ready to Watch
+    filters:
+      and:
+        - status == "to-watch"
+    order:
+      - file.name
+      - imdb_url
+      - current_season
+      - last_season_watched
+      - next_season_start
+      - next_season_date
+      - formula.days_until
+      - series_status
+      - my_rating

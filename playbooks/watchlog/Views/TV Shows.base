@@ -1,0 +1,112 @@
+filters:
+  and:
+    - file.inFolder("TV Shows")
+    - file.basename != "_Standout Episodes"
+properties:
+  my_rating:
+    displayName: My Rating
+  imdb_rating:
+    displayName: IMDB
+  imdb_url:
+    displayName: URL
+  series_status:
+    displayName: Series
+  following:
+    displayName: Following
+  current_season:
+    displayName: Season
+  last_season_watched:
+    displayName: Up To
+  next_season_date:
+    displayName: Next Season
+  date_watched:
+    displayName: Last Watched
+  worth_it:
+    displayName: Worth It
+views:
+  - type: table
+    name: All
+    order:
+      - file.name
+      - imdb_url
+      - year
+      - my_rating
+      - worth_it
+      - imdb_rating
+      - genres
+      - status
+      - series_status
+      - following
+      - date_watched
+    sort:
+      - property: my_rating
+        direction: DESC
+  - type: table
+    name: Watched
+    filters:
+      and:
+        - status == "watched"
+    order:
+      - file.name
+      - imdb_url
+      - year
+      - my_rating
+      - worth_it
+      - imdb_rating
+      - genres
+      - current_season
+      - last_season_watched
+      - series_status
+      - following
+      - date_watched
+  - type: table
+    name: To Watch
+    filters:
+      or:
+        - status == "to-watch"
+        - status == "to-rewatch"
+        - status == "watching"
+    order:
+      - file.name
+      - imdb_url
+      - year
+      - imdb_rating
+      - genres
+      - status
+      - series_status
+      - next_season_date
+  - type: table
+    name: Following
+    filters:
+      and:
+        - following != false
+        - series_status != "Ended"
+        - or:
+            - status == "watched"
+            - status == "watching"
+    order:
+      - file.name
+      - imdb_url
+      - my_rating
+      - current_season
+      - last_season_watched
+      - next_season_start
+      - next_season_date
+      - series_status
+  - type: table
+    name: By Rating
+    filters:
+      and:
+        - status == "watched"
+        - my_rating != ""
+    groupBy:
+      property: my_rating
+      direction: DESC
+    order:
+      - file.name
+      - imdb_url
+      - year
+      - my_rating
+      - worth_it
+      - imdb_rating
+      - series_status

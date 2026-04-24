@@ -1,0 +1,4 @@
+.bases-tbody .bases-tr:hover .bases-td {
+    background-color: rgba(0,0,0,0.8) !important;
+    transition: background-color 0.1s ease;
+}

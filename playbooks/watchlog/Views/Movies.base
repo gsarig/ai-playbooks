@@ -1,0 +1,87 @@
+filters:
+  and:
+    - file.inFolder("Movies")
+formulas:
+  days_since: if(date_watched, (today() - date(date_watched)).days, "")
+properties:
+  my_rating:
+    displayName: My Rating
+  imdb_rating:
+    displayName: IMDB
+  imdb_url:
+    displayName: URL
+  date_watched:
+    displayName: Watched
+  formula.days_since:
+    displayName: Days Ago
+  worth_it:
+    displayName: Worth It
+views:
+  - type: table
+    name: All
+    order:
+      - file.name
+      - imdb_url
+      - year
+      - my_rating
+      - worth_it
+      - imdb_rating
+      - genres
+      - directors
+      - runtime
+      - status
+      - date_watched
+    sort:
+      - property: worth_it
+        direction: DESC
+      - property: my_rating
+        direction: DESC
+  - type: table
+    name: Watched
+    filters:
+      and:
+        - status == "watched"
+    order:
+      - file.name
+      - imdb_url
+      - year
+      - my_rating
+      - worth_it
+      - imdb_rating
+      - genres
+      - directors
+      - runtime
+      - date_watched
+    sort:
+      - property: my_rating
+        direction: DESC
+  - type: table
+    name: To Watch
+    filters:
+      or:
+        - status == "to-watch"
+        - status == "to-rewatch"
+    order:
+      - file.name
+      - imdb_url
+      - year
+      - imdb_rating
+      - genres
+      - status
+  - type: table
+    name: By Rating
+    filters:
+      and:
+        - status == "watched"
+        - my_rating != ""
+    groupBy:
+      property: my_rating
+      direction: DESC
+    order:
+      - file.name
+      - imdb_url
+      - year
+      - my_rating
+      - worth_it
+      - imdb_rating
+      - date_watched

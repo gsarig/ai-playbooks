@@ -11,6 +11,7 @@ A collection of standalone workflow blueprints for AI-assisted creative and know
 | [playbooks/stories/](playbooks/stories/) | Fiction writing workflow — novels, novellas, and short stories |
 | [playbooks/resource-library/](playbooks/resource-library/) | Scaffold for a personal evaluated resource library, powered by the evaluate-resource skill — [live example](https://ai-resources.gsarigiannidis.gr/) |
 | [playbooks/plant-health-tracker/](playbooks/plant-health-tracker/) | AI-powered plant health monitor — drop photos into a staging folder, get per-plant reports and a live dashboard in Obsidian |
+| [playbooks/watchlog/](playbooks/watchlog/) | Movie and TV show tracker — import from IMDB, enrich via TVmaze and OMDB, browse with Bases views and dashboards — [live example](https://watch.gsarigiannidis.gr/) |
 
 ## Resources
 

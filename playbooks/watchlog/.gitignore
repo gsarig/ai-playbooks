@@ -1,0 +1,8 @@
+.obsidian/workspace*
+.obsidian/graph.json
+.obsidian/cache
+.import-state.json
+imports/*.csv
+.DS_Store
+scripts/__pycache__/
+.env

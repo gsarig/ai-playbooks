@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "0.1.0",
+  "name": "Watchlog — Queue",
+  "behavior": "append-to-note",
+  "noteContentFormat": "{% if selector:[data-testid='hero-rating-bar__user-rating__score'] span %}{{url}} :: {{selector:[data-testid='hero-rating-bar__user-rating__score'] span|first}}{% else %}{{url}}{% endif %}\n",
+  "properties": [],
+  "targetNote": "_Queue",
+  "noteNameFormat": "",
+  "folder": "",
+  "triggers": ["https://www.imdb.com/title/"]
+}
