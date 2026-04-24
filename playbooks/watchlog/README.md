@@ -4,6 +4,10 @@
 
 A personal movie and TV show tracking vault for Obsidian and Claude Code. Import your IMDB ratings and watchlist, enrich each entry with TVmaze and OMDB metadata, then browse everything through live Bases views and DataviewJS dashboards. Add new entries any time via a queue note and a Web Clipper template without touching a CSV.
 
+![Watchlog Bases view](../../assets/watchlog-1.png)
+
+![Watchlog Dashboard](../../assets/watchlog-2.png)
+
 ---
 
 ## Requirements
