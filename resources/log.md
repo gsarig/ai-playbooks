@@ -34,3 +34,4 @@ Every URL that has passed through the evaluation pipeline, regardless of outcome
 | 2026-04-22 | https://github.com/cytostack/openwolf | reviewed | openwolf-a-second-brain-for-claude-code.md |
 | 2026-04-22 | https://github.com/gsd-build/get-shit-done | reviewed | get-shit-done-gsd.md |
 | 2026-04-23 | https://github.com/basicmachines-co/basic-memory | reviewed | basic-memory.md |
+| 2026-04-26 | https://github.com/nidhinjs/prompt-master | reviewed | nidhinjs-prompt-master.md |
