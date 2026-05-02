@@ -338,6 +338,8 @@ def needs_tvmaze(fm: dict, ttl: int) -> bool:
         return True
     if not fm.get('language'):  # backfill new metadata fields for existing notes
         return True
+    if not fm.get('poster'):    # backfill poster for existing notes
+        return True
     if fm.get('series_status') == 'Ended':
         return False
     last = fm.get('tvmaze_last_checked', '')

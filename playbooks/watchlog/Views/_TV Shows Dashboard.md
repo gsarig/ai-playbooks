@@ -5,6 +5,134 @@ cssclasses:
 
 # TV Shows Dashboard
 
+## Active Seasons
+
+```dataviewjs
+const NL = String.fromCharCode(10);
+const today = dv.date("today");
+
+const PLACEHOLDER = 'data:image/svg+xml;base64,' + btoa(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="52" viewBox="0 0 36 52">' +
+  '<rect width="36" height="52" rx="3" fill="#1e1e1e"/>' +
+  '<rect x="3" y="3" width="4" height="4" rx="1" fill="#2e2e2e"/>' +
+  '<rect x="10" y="3" width="4" height="4" rx="1" fill="#2e2e2e"/>' +
+  '<rect x="17" y="3" width="4" height="4" rx="1" fill="#2e2e2e"/>' +
+  '<rect x="24" y="3" width="4" height="4" rx="1" fill="#2e2e2e"/>' +
+  '<rect x="3" y="45" width="4" height="4" rx="1" fill="#2e2e2e"/>' +
+  '<rect x="10" y="45" width="4" height="4" rx="1" fill="#2e2e2e"/>' +
+  '<rect x="17" y="45" width="4" height="4" rx="1" fill="#2e2e2e"/>' +
+  '<rect x="24" y="45" width="4" height="4" rx="1" fill="#2e2e2e"/>' +
+  '<polygon points="13,20 13,32 24,26" fill="#2e2e2e"/>' +
+  '</svg>'
+);
+
+function toDateStr(d) {
+  if (!d) return "";
+  return String(d).slice(0, 10);
+}
+
+function fmtDate(d) {
+  return toDateStr(d) || "–";
+}
+
+async function writeField(filePath, key, value) {
+  const tfile = app.vault.getAbstractFileByPath(filePath);
+  if (!tfile) return;
+  let content = await app.vault.read(tfile);
+  const pattern = new RegExp("^(" + key + ":[ \\t]*).*$", "m");
+  if (pattern.test(content)) {
+    content = content.replace(pattern, "$1" + value);
+  } else {
+    content = content.replace(NL + "---" + NL, NL + key + ": " + value + NL + "---" + NL);
+  }
+  await app.vault.modify(tfile, content);
+}
+
+const shows = dv.pages('"TV Shows"')
+  .where(p => {
+    if (!p.imdb_id || p.following === false) return false;
+    if (!p.next_season_date) return false;
+    const lw = toDateStr(p.last_season_watched);
+    const ss = toDateStr(p.next_season_start);
+    return !(lw && lw === ss);
+  })
+  .sort(p => p.next_season_date, "asc")
+  .array();
+
+if (shows.length === 0) {
+  dv.el("p", "No active seasons right now.");
+} else {
+  const table = dv.el("table", "", { cls: "active-seasons-table" });
+  const thead = table.createEl("thead");
+  const hr = thead.createEl("tr");
+  ["", "Show", "Season", "Ends", "Following", "Watched"].forEach(h => hr.createEl("th", { text: h }));
+  const tbody = table.createEl("tbody");
+
+  for (const p of shows) {
+    const tr = tbody.createEl("tr");
+
+    const tdPoster = tr.createEl("td");
+    tdPoster.style.width = "40px";
+    tdPoster.style.padding = "2px 4px";
+    const img = tdPoster.createEl("img");
+    img.src = p.poster ? String(p.poster) : PLACEHOLDER;
+    img.style.height = "52px";
+    img.style.width = "36px";
+    img.style.objectFit = "cover";
+    img.style.borderRadius = "3px";
+    img.style.display = "block";
+    img.onerror = () => { img.onerror = null; img.src = PLACEHOLDER; };
+
+    const tdShow = tr.createEl("td");
+    const link = tdShow.createEl("a", { text: p.title || p.file.name, cls: "internal-link" });
+    link.dataset.href = p.file.path;
+    link.href = p.file.path;
+
+    tdShow.createEl("br");
+
+    if (p.imdb_url) {
+      const a = tdShow.createEl("a");
+      a.href = String(p.imdb_url);
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.title = "IMDb";
+      a.style.marginRight = "4px";
+      a.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#f5c518" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+    }
+
+    if (p.tvmaze_id) {
+      const a = tdShow.createEl("a");
+      a.href = "https://www.tvmaze.com/shows/" + String(p.tvmaze_id);
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.title = "TVmaze";
+      a.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M16 2l-4 5-4-5"/></svg>';
+    }
+
+    tr.createEl("td", { text: p.current_season ? String(p.current_season) : "–" });
+    tr.createEl("td", { text: fmtDate(p.next_season_date) });
+
+    const tdFollow = tr.createEl("td");
+    const followCb = tdFollow.createEl("input");
+    followCb.type = "checkbox";
+    followCb.checked = true;
+    followCb.addEventListener("change", async () => {
+      await writeField(p.file.path, "following", "false");
+    });
+
+    const tdWatched = tr.createEl("td");
+    const watchedCb = tdWatched.createEl("input");
+    watchedCb.type = "checkbox";
+    watchedCb.checked = false;
+    watchedCb.addEventListener("change", async () => {
+      if (watchedCb.checked) {
+        await writeField(p.file.path, "last_season_watched", toDateStr(p.next_season_start));
+      }
+    });
+  }
+}
+```
+
 ## Stats
 
 ```dataviewjs
