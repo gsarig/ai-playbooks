@@ -68,7 +68,21 @@ if (shows.length === 0) {
   ["", "Show", "Season", "Ends", "Following", "Watched"].forEach(h => hr.createEl("th", { text: h }));
   const tbody = table.createEl("tbody");
 
+  const todayStr = toDateStr(today);
+  let separatorInserted = false;
+
   for (const p of shows) {
+    if (!separatorInserted && toDateStr(p.next_season_date) >= todayStr) {
+      separatorInserted = true;
+      const sepRow = tbody.createEl("tr");
+      const sepTd = sepRow.createEl("td");
+      sepTd.colSpan = 6;
+      sepTd.style.padding = "0";
+      sepTd.style.height = "2px";
+      sepTd.style.background = "var(--color-accent, #7c6af7)";
+      sepTd.style.opacity = "0.5";
+    }
+
     const tr = tbody.createEl("tr");
 
     const tdPoster = tr.createEl("td");
@@ -97,7 +111,8 @@ if (shows.length === 0) {
       a.rel = "noopener";
       a.title = "IMDb";
       a.style.marginRight = "4px";
-      a.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#f5c518" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+      a.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#f5c518" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'
+        + (p.imdb_rating ? '<span style="font-size:11px;vertical-align:middle;margin-left:2px;color:var(--text-muted)">' + p.imdb_rating + '</span>' : '');
     }
 
     if (p.tvmaze_id) {
