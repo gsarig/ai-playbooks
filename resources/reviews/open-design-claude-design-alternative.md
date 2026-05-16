@@ -1,0 +1,24 @@
+---
+title: "Open Design, open-source alternative to Claude Design"
+url: https://github.com/nexu-io/open-design
+author: "nexu-io"
+date_evaluated: 2026-05-16
+verdict: catalog
+tags: [design-systems, ai-agents, claude-code, skills, prototyping, byok, local-first, electron]
+---
+
+## What it proposes
+
+A local-first, Apache-2.0 runtime that turns whichever coding-agent CLI is already on your `PATH` (Claude Code, Codex, Cursor Agent, Gemini CLI, Copilot CLI, and a dozen others) into a design engine for web, mobile, slide, image, and short-video artifacts. A local Node daemon owns the workflow: it scans for installed CLIs, spawns one with `cwd` set to a per-project working folder under `.od/projects/<id>/`, and gives the agent real `Read`, `Write`, `Bash`, and `WebFetch` tools. The product is the prompt stack, not the model. Every turn assembles a `DISCOVERY` directive (a hard-coded turn-1 question form before any pixel is drawn), an identity charter, the active `DESIGN.md` (one of 72 brand systems following the `awesome-design-md` schema, such as Linear, Stripe, Vercel, Apple, Anthropic), the active `SKILL.md` (one of 31 surfaces, including landing pages, dashboards, mobile onboarding, magazine decks, invoices, runbooks), plus a five-dimensional self-critique pass before the artifact is shown. Output renders in a sandboxed `srcdoc` iframe and exports as HTML, PDF, PPTX, ZIP, or Markdown. A BYOK proxy at `/api/proxy/{anthropic,openai,azure,google}/stream` covers the case where no CLI is installed; SSRF is blocked at the daemon edge. Persistence is a local SQLite file. Deploys as `pnpm tools-dev`, a Docker compose stack, the Vercel web layer, or a prebuilt Electron app for macOS and Windows.
+
+## Best used when
+
+A project produces recurring visual artifacts (landing pages, marketing assets, mobile-app prototypes, branded decks, social carousels, dashboard mockups) and the operator already has at least one agent CLI installed. The setup pays back when there is a real brand system worth enforcing across artifacts (so the agent stops freestyling palettes), when multiple stakeholders need consistent surfaces produced fast, or when several distinct design surfaces share one workflow (a marketing site, a pitch deck, and a social carousel for the same launch). The "skills as folders" pattern fits anyone already invested in the Claude Code skill convention; adding a custom surface is a `SKILL.md` + `assets/` + `references/` folder, no plugin contract. The BYOK and local-daemon architecture also fits operators who want auditability over what is shipped to which provider and prefer running on hardware they own.
+
+## Poor fit when
+
+The work is text-first with no design surface: fiction drafting, note-taking, knowledge vaults, tracking vaults, research archives, data pipelines. There is no brand to lock down, no `DESIGN.md` to author, and the 31 prebuilt surfaces are all visual; the prompt stack's whole value collapses if the artifact never renders as pixels. The infrastructure cost is also high relative to occasional one-off use: a daemon, SQLite, an iframe parser, a per-CLI adapter, an Electron shell, and `~24` Node with pnpm `10.33.x` are appropriate when design output is a real workflow but heavy for the once-a-quarter launch graphic. The catalog of agent CLIs and design systems also drifts fast (the README already lists CLIs that did not exist a year prior), so a project that adopts it locks itself to a moving target. Finally, the project is young enough that schema and adapter contracts will keep shifting; production reliance today means budgeting for upgrade churn.
+
+## Verdict
+
+Catalog. Open Design is the most credible open-source answer to the closed-and-paid Claude Design surface, and the architectural choices are right: keep the agent on the laptop, treat skills and design systems as Markdown files instead of plugins, lock the brief with a question form before the model improvises, and run the artifact in a sandboxed iframe so the preview cannot escape into the host. The BYOK proxy with SSRF blocking and the loopback allowance for local LLMs such as Ollama and LM Studio is a thoughtful detail. None of this changes the fact that adopting it only makes sense where a real, recurring design workflow exists. For text, tracking, knowledge, and writing-centric vaults the surface area is too small to justify the stack: the work has no `DESIGN.md` to author and no skill in the box maps onto it. Worth bookmarking the moment a project grows a designed UI layer, a recurring marketing pipeline, or a book or product launch cadence where decks, social cards, and landing pages start repeating. Until then the load-bearing ideas (the turn-1 discovery form, the prompt-stack-as-product, "skills are files," and the local daemon spawning your existing CLI) are transferable patterns worth remembering even if the tool itself stays uninstalled.

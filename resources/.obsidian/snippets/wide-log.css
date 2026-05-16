@@ -1,0 +1,4 @@
+.markdown-preview-view.wide-log .markdown-preview-sizer,
+.markdown-source-view.mod-cm6.wide-log .cm-sizer {
+  max-width: 1400px !important;
+}

@@ -9,6 +9,13 @@ CLAUDE="/home/gsarig/.local/bin/claude"
 
 cd "$REPO_DIR" || exit 1
 
+# Rename any queued files whose names contain emoji or other non-ASCII
+# characters. WSL's 9P bridge throws an I/O error when listing directories
+# that contain such filenames, which makes the glob below silently return
+# zero matches and skip processing.
+/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -NoProfile -ExecutionPolicy Bypass \
+    -File "$(wslpath -w "$REPO_DIR/scripts/sanitize_tmp.ps1")" >/dev/null 2>&1
+
 shopt -s nullglob
 files=("$TMP_DIR"/*.md)
 

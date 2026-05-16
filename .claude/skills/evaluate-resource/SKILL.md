@@ -114,15 +114,15 @@ Once the user approves (or after incorporating corrections):
 - **`EXTEND`**: append the `## Related` entry to the existing review at `resources/reviews/<existing-filename>.md`. If a `## Related` section already exists, add the new bullet to it; otherwise add the section at the end of the file.
 - **Full draft**: write the file to `resources/reviews/<filename>.md`.
 
-In both cases, also append a row to `resources/log.md`. For `DUPLICATE`, append the log row but write nothing else.
+In both cases, also insert a row into `resources/log.md`. For `DUPLICATE`, insert the log row but write nothing else.
 
-In all cases (including `DUPLICATE`), append a row to `resources/log.md`:
+In all cases (including `DUPLICATE`), insert a row into `resources/log.md` immediately below the table header (so the newest entry sits at the top, since the log is sorted newest-first):
 
 ```
 | YYYY-MM-DD | <url> | <outcome> | <notes> |
 ```
 
-Where outcome is `reviewed`, `extended`, or `duplicate`, and notes names the relevant file or explains why it was skipped.
+Where outcome is `reviewed`, `extended`, or `duplicate`, and notes is a wikilink to the relevant review file (e.g. `[[review-slug]]`) or a short explanation of why it was skipped.
 
 The `resources/_index.md` is maintained automatically by Bases — no manual update needed.
 
