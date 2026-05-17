@@ -9,6 +9,7 @@ Every URL that has passed through the evaluation pipeline, regardless of outcome
 
 | Date | URL | Outcome | Notes |
 |------|-----|---------|-------|
+| 2026-05-17 | https://github.com/anthropics/claude-for-legal | reviewed | [[claude-for-legal]] |
 | 2026-05-16 | https://github.com/rtk-ai/rtk | reviewed | [[rtk-cli-output-filter]] |
 | 2026-05-16 | https://github.com/nexu-io/open-design | duplicate | already reviewed as [[open-design-claude-design-alternative]] |
 | 2026-05-16 | https://github.com/nexu-io/open-design | reviewed | [[open-design-claude-design-alternative]] |
