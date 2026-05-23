@@ -1,3 +1,7 @@
+---
+project_name: AI Playbooks
+---
+
 # ai-playbooks — Project Rules
 
 ## Repo structure
