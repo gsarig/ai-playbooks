@@ -1,11 +1,22 @@
 #!/usr/bin/env bash
 # Evaluates URLs queued in resources/tmp/ and writes reviews to resources/reviews/.
-# Safe to call as often as needed (cron runs it every 5 minutes).
+# Cron runs it every 5 minutes. A flock guard ensures only one instance runs at a
+# time: if a run is still going when the next fires, the new one exits immediately.
+# This prevents overlapping runs from processing the same queued file twice (a file
+# is only removed at the end of its evaluation, so it stays visible to other runs).
 
 REPO_DIR="/mnt/d/ai-playbooks"
 TMP_DIR="$REPO_DIR/resources/tmp"
 LOG="$HOME/resource_evaluator.log"
 CLAUDE="/home/gsarig/.local/bin/claude"
+LOCK="$HOME/.evaluate_resources.lock"
+
+# Take a non-blocking lock so an overlapping run exits immediately. The lock lives
+# on the Linux filesystem because advisory locking is unreliable on the /mnt/d
+# DrvFs mount, and flock releases it automatically on exit, so a crash leaves no
+# stale lock behind.
+exec 200>"$LOCK"
+flock -n 200 || exit 0
 
 cd "$REPO_DIR" || exit 1
 
