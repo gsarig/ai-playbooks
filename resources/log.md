@@ -9,6 +9,10 @@ Every URL that has passed through the evaluation pipeline, regardless of outcome
 
 | Date | URL | Outcome | Notes |
 |------|-----|---------|-------|
+| 2026-05-27 | https://code.claude.com/docs/en/security-guidance | reviewed | [[security-guidance-plugin-for-claude-code]] |
+| 2026-05-25 | https://developer.chrome.com/docs/modern-web-guidance | reviewed | [[modern-web-guidance]] |
+| 2026-05-21 | https://github.com/punkpeye/awesome-mcp-servers | reviewed | [[punkpeye-awesome-mcp-servers]] |
+| 2026-05-18 | https://www.aihero.dev/grill-with-docs | reviewed | [[grill-with-docs-align-before-you-build]] |
 | 2026-05-17 | https://github.com/anthropics/claude-for-legal | reviewed | [[claude-for-legal]] |
 | 2026-05-16 | https://github.com/rtk-ai/rtk | reviewed | [[rtk-cli-output-filter]] |
 | 2026-05-16 | https://github.com/nexu-io/open-design | duplicate | already reviewed as [[open-design-claude-design-alternative]] |
