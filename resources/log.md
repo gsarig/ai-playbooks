@@ -9,6 +9,9 @@ Every URL that has passed through the evaluation pipeline, regardless of outcome
 
 | Date | URL | Outcome | Notes |
 |------|-----|---------|-------|
+| 2026-05-29 | https://claude.com/blog/introducing-dynamic-workflows-in-claude-code | reviewed | [[introducing-dynamic-workflows-in-claude-code]] |
+| 2026-05-27 | https://humanmade.com/engineering/how-to-code-with-ai-agents/ | reviewed | [[how-to-code-with-ai-agents]] |
+| 2026-05-27 | https://joost.blog/self-updating-agent-skills/ | duplicate | already reviewed as [[how-i-made-my-skills-update-themselves]] |
 | 2026-05-27 | https://code.claude.com/docs/en/security-guidance | reviewed | [[security-guidance-plugin-for-claude-code]] |
 | 2026-05-25 | https://developer.chrome.com/docs/modern-web-guidance | reviewed | [[modern-web-guidance]] |
 | 2026-05-21 | https://github.com/punkpeye/awesome-mcp-servers | reviewed | [[punkpeye-awesome-mcp-servers]] |
