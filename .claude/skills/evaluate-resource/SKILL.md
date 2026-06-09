@@ -30,7 +30,7 @@ Use the appropriate tool to retrieve the content at the URL:
 
 Read enough to understand the core methodology or proposal — not just the summary.
 
-### 3. Check for overlap
+### 3. Check for overlap and existing capabilities
 
 **First**, read `resources/log.md` and check whether the URL appears in it.
 
@@ -40,6 +40,8 @@ Read enough to understand the core methodology or proposal — not just the summ
 
 - If the title or topic looks **substantially similar** to one or more existing entries: read those reviews in full and carry them into step 4. The Opus subagent will assess overlap as part of its work.
 - If nothing looks related: proceed to step 4 with no existing reviews attached.
+
+**Finally**, check whether the project already *implements* the resource's core idea as a live capability: a skill, slash command, hook, or established workflow available in this session. This is distinct from the review-duplication check above; a resource can be unreviewed yet already adopted in practice (e.g. an adversarial-critique agent whose mechanism a local `devils-advocate`-style skill already provides). Note any such capability, by name, and carry it into steps 4 and 5.
 
 ### 4. Draft the evaluation using an Opus subagent
 
@@ -56,6 +58,8 @@ Spawn an Agent with `model: "opus"` and pass it:
 - **Distinct enough to stand alone**: proceed with a full draft as normal.
 
 **Important framing for the agent:** the evaluation lives in a public repo and must be durable across projects. Write entirely in generic terms — problem types, vault categories, workflow patterns. Do not reference specific project names, file paths, or personal setups. Use the personal context only to calibrate judgment (e.g. deciding what "Best used when" conditions are realistic), never to cite it directly.
+
+**If an existing capability already implements the resource's core idea** (per step 3), treat that as calibration too: frame the verdict realistically rather than pitching a solved pattern as novel. A mature setup likely already has an equivalent, so position the resource as a complement, a marginal delta, or already-adopted-in-spirit, and say what (if anything) it adds beyond what such setups already do. Keep the prose generic; the existing-capability awareness shapes the judgment, never the written content. Do not name the specific skill, command, or file in the review.
 
 Use this exact structure:
 
@@ -106,6 +110,8 @@ Handle the three possible outcomes from step 4:
 - **`DUPLICATE`**: tell the user the resource is already covered by the named review. No further action needed.
 - **`EXTEND`**: show the proposed `## Related` entry and the name of the existing review it would be appended to. Ask for confirmation before writing.
 - **Full draft**: show the complete draft. Ask for corrections or confirmation before writing anything.
+
+If step 3 found an existing capability that already implements the resource, flag it here in plain chat and name it (the skill, command, or review), so the user can judge whether the resource adds anything. This note stays in the conversation; it must not appear in the written review, which is kept generic for the public repo.
 
 ### 6. Write on confirmation
 
