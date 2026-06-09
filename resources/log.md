@@ -9,6 +9,9 @@ Every URL that has passed through the evaluation pipeline, regardless of outcome
 
 | Date | URL | Outcome | Notes |
 |------|-----|---------|-------|
+| 2026-06-09 | https://github.com/aaif-goose/goose | reviewed | [[goose-open-source-general-purpose-ai-agent-runtime]] |
+| 2026-06-09 | https://x.com/addyosmani/status/2064127981161959567 | reviewed | [[loop-engineering]] |
+| 2026-06-04 | https://github.com/aaddrick/contrarian/blob/main/.claude/agents/contrarian.md | reviewed | [[contrarian-devils-advocate-subagent]] |
 | 2026-05-29 | https://claude.com/blog/introducing-dynamic-workflows-in-claude-code | reviewed | [[introducing-dynamic-workflows-in-claude-code]] |
 | 2026-05-27 | https://humanmade.com/engineering/how-to-code-with-ai-agents/ | reviewed | [[how-to-code-with-ai-agents]] |
 | 2026-05-27 | https://joost.blog/self-updating-agent-skills/ | duplicate | already reviewed as [[how-i-made-my-skills-update-themselves]] |

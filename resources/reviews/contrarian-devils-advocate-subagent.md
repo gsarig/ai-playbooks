@@ -1,0 +1,26 @@
+---
+title: "Contrarian: a devil's-advocate subagent for stress-testing proposals"
+url: https://github.com/aaddrick/contrarian/blob/main/.claude/agents/contrarian.md
+author: "aaddrick"
+date_evaluated: 2026-06-04
+verdict: adapt
+tags: [claude-code, subagent, adversarial-review, pre-mortem, decision-validation, devils-advocate]
+---
+
+## What it proposes
+
+A single Claude Code subagent definition (one markdown file dropped into `.claude/agents/`) that plays an assigned devil's advocate. It deliberately does not review code; it stress-tests strategy, architecture decisions, and hidden risks, drawing on the "Tenth Man Rule": when everyone agrees, someone is duty-bound to assume the consensus is wrong and investigate that world.
+
+The mechanism is a structured prompt with five load-bearing parts. A core principle forbids objection without a proposed alternative or mitigation ("this could fail" is rejected; "this fails under condition X because of Y, consider Z" is required). An ordered analytical toolkit runs steel-man first (re-express the position fairly and list strengths before any critique), then an assumption audit (enumerate unstated assumptions, classify each by likelihood-of-being-wrong and impact-if-wrong, focus on the high-impact uncertain ones), then pre-mortem, inversion, and second-order-effects tracing. A fixed output format yields Strengths, then Findings tagged by severity (Critical/Major/Minor) each carrying assumption-challenged / failure-scenario / impact / recommendation, then a one-of-three Verdict. An anti-patterns list guards against contrarianism for its own sake, nihilism, straw-manning, reverse confirmation bias, and personality critique. Finally, a calibration rule scales analysis intensity to stakes, from light-touch on reversible decisions to exhaustive pre-mortem on architecture/security. It is public domain (UNLICENSE) and self-describes as an extension of an earlier lightweight contrarian agent, adding the structured output, anti-patterns, and calibration.
+
+## Best used when
+
+The payoff is highest where a decision is hard to reverse and the cost of a wrong call is paid later: architecture and infrastructure choices, "should we even build this?" gate questions, and any plan that has quietly reached consensus without scrutiny. It suits workflows that already run agents/subagents and want adversarial review available on demand without a human interlocutor present. The steel-man-first ordering and the no-objection-without-an-alternative rule make it usable on one's own work, where unstructured self-critique tends to be either too soft or demoralising. The calibration clause keeps it from being a heavyweight ritual on small choices, so it can sit in a project permanently rather than being reserved for big set pieces. Because it is one dependency-free public-domain file, it carries essentially zero adoption cost and is trivially portable across projects.
+
+## Poor fit when
+
+It is the wrong tool for code-level review, implementation detail, or infra mechanics; the definition itself defers those to specialists, and using it there wastes the framing. The README's "Not in scope" delegation block names specialist agents that will not exist in most setups, so that section must be rewritten or deleted per project or the agent will reference phantom delegates. As a one-shot critique it cannot probe answers, follow a thread, or resolve dependent decisions interactively; where a plan's weaknesses only surface through back-and-forth questioning, an interview-style adversarial pass gets further than a single batched verdict. Its quality is bounded by the context it is handed: pointed at a thin proposal it will challenge stated assumptions but cannot discover the unstated constraints a human reviewer would already know. And like any always-assigned dissenter, it manufactures a critique even when the plan is genuinely sound; the calibration and anti-pattern rules dampen this but do not remove it, so its output still needs a human to weigh, not obey.
+
+## Verdict
+
+Adapt. The underlying idea is well-built and durable: assigned dissent, steel-man before critique, no objection without an alternative, severity-tagged findings, and intensity scaled to stakes together make a genuinely better adversarial-review prompt than the ad-hoc "poke holes in this" most people use, and the public-domain single-file format makes it cheap to lift. It falls short of adopt-as-is for two reasons. First, the in-scope/out-of-scope delegation section is template scaffolding that points at specialist agents a given project won't have, so it requires editing before it behaves correctly. Second, one-shot batch critique and interactive interview-style stress-testing are complementary, not interchangeable; a setup that already validates plans through adversarial questioning should treat this as the non-interactive complement for unattended or async passes rather than a replacement, and should fold its strongest concepts (the assumption likelihood/impact matrix, the anti-pattern guardrails, the stakes calibration) into whatever stress-testing it already does. Worth adopting in adapted form by anyone running Claude Code subagents who wants on-demand decision validation; copy the file, strip the delegation block to match the project, and treat its verdict as input rather than authority.
