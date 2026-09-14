@@ -1,9 +1,0 @@
-{
-  "theme": "moonstone",
-  "textFontFamily": "Georgia",
-  "baseFontSize": 18,
-  "baseFontSizeAction": true,
-  "enabledCssSnippets": [
-    "chapter"
-  ]
-}
