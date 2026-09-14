@@ -9,6 +9,16 @@ Every URL that has passed through the evaluation pipeline, regardless of outcome
 
 | Date | URL | Outcome | Notes |
 |------|-----|---------|-------|
+| 2026-09-14 | https://github.com/alibaba/open-code-review | reviewed | [[open-code-review-deterministic-hybrid-ai-code-review-cli]] |
+| 2026-09-05 | https://github.com/affaan-m/ECC | reviewed | [[ecc-agent-harness-performance-optimization-system]] |
+| 2026-08-20 | https://portal.spotify.com/blog/introducing-xirp | reviewed | [[what-weve-learned-scaling-ai-coding-agents-at-spotify]] |
+| 2026-08-12 | https://github.com/cathrynlavery/diagram-design | reviewed | [[diagram-design]] |
+| 2026-08-07 | https://github.com/elidickinson/pi-claude-bridge | reviewed | [[pi-claude-bridge-claude-code-as-a-provider-inside-another-agent-harness]] |
+| 2026-07-30 | https://github.com/woosal1337/blog/tree/main/videos/ep01-the-cure-for-ai-slop | reviewed | [[asd-ste100-as-an-anti-slop-writing-system-for-llm-prose]] |
+| 2026-07-05 | https://github.com/teamchong/pxpipe | reviewed | [[pxpipe-render-bulky-llm-context-as-images-to-cut-input-tokens]] |
+| 2026-06-30 | https://www.coderabbit.ai/blog/loop-engineering | extended | → [[loop-engineering]] (Related entry) |
+| 2026-06-25 | https://github.com/unslothai/unsloth | reviewed | [[unsloth-studio-local-llm-training-and-inference-toolkit]] |
+| 2026-06-25 | https://docs.axolotl.ai/ | reviewed | [[axolotl]] |
 | 2026-06-09 | https://github.com/aaif-goose/goose | reviewed | [[goose-open-source-general-purpose-ai-agent-runtime]] |
 | 2026-06-09 | https://x.com/addyosmani/status/2064127981161959567 | reviewed | [[loop-engineering]] |
 | 2026-06-04 | https://github.com/aaddrick/contrarian/blob/main/.claude/agents/contrarian.md | reviewed | [[contrarian-devils-advocate-subagent]] |
