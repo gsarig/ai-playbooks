@@ -9,6 +9,10 @@ Every URL that has passed through the evaluation pipeline, regardless of outcome
 
 | Date | URL | Outcome | Notes |
 |------|-----|---------|-------|
+| 2026-09-20 | https://ruben.substack.com/p/jev | extended | [[jev-rlcd-non-generative-decision-model-announcement]] |
+| 2026-09-19 | https://typesafe.ai/blog/introducing-system-one-models-and-jev | extended | [[jev-rlcd-non-generative-decision-model-announcement]] |
+| 2026-09-18 | https://x.com/CompleteSkeptic/status/2099925682726002904?s=20 | reviewed | [[jev-rlcd-non-generative-decision-model-announcement]] |
+| 2026-09-17 | https://github.com/cloudflare/security-audit-skill | reviewed | [[cloudflare-security-audit-skill]] |
 | 2026-09-14 | https://github.com/alibaba/open-code-review | reviewed | [[open-code-review-deterministic-hybrid-ai-code-review-cli]] |
 | 2026-09-05 | https://github.com/affaan-m/ECC | reviewed | [[ecc-agent-harness-performance-optimization-system]] |
 | 2026-08-20 | https://portal.spotify.com/blog/introducing-xirp | reviewed | [[what-weve-learned-scaling-ai-coding-agents-at-spotify]] |
