@@ -22,7 +22,7 @@ import os
 import re
 import sys
 import time
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 try:
@@ -126,8 +126,8 @@ def read_frontmatter(content: str) -> tuple[dict, str]:
 
 def update_field(content: str, key: str, value) -> str:
     """Replace a single frontmatter field in-place."""
-    pattern = re.compile(rf'^({re.escape(key)}:[^\S\n]*).*$', re.MULTILINE)
-    replacement = rf'\g<1>{_yaml_value(value)}'
+    pattern = re.compile(rf'^{re.escape(key)}:[^\S\n]*.*$', re.MULTILINE)
+    replacement = f'{key}: {_yaml_value(value)}'
     new, count = pattern.subn(replacement, content, count=1)
     if count == 0:
         # Field missing — insert before closing --- (first \n--- not at position 0)
@@ -225,6 +225,8 @@ def tvmaze_fetch(imdb_id: str, title: str, tvmaze_id: int | None = None) -> dict
         'tvmaze_id':           '',
         'total_seasons':       '',
         'series_status':       '',
+        'current_season':      '',
+        'poster':              '',
         'next_season_start':   '',
         'next_season_date':    '',
         'tvmaze_last_checked': str(date.today()),
@@ -258,6 +260,7 @@ def tvmaze_fetch(imdb_id: str, title: str, tvmaze_id: int | None = None) -> dict
         show = r.json()
         result['tvmaze_id']     = str(show['id'])
         result['series_status'] = show.get('status', '')
+        result['poster']        = (show.get('image') or {}).get('medium', '')
         result['language']      = show.get('language', '') or ''
         result['show_type']     = show.get('type', '') or ''
         result['premiered']     = show.get('premiered', '') or ''
@@ -283,19 +286,22 @@ def tvmaze_fetch(imdb_id: str, title: str, tvmaze_id: int | None = None) -> dict
             return result
 
         today = str(date.today())
+        six_months_ago = str(date.today() - timedelta(days=180))
 
-        # Upcoming = premiere in the future OR no end date yet
+        # Upcoming = airing/future, or recently ended (within 6 months)
         upcoming = [
             s for s in seasons
             if (s.get('endDate') and s['endDate'] >= today)
             or (s.get('premiereDate') and s['premiereDate'] >= today)
             or (s.get('premiereDate') and not s.get('endDate'))
+            or (s.get('endDate') and s['endDate'] >= six_months_ago)
         ]
         if not upcoming:
             return result
 
         next_s = min(upcoming, key=lambda s: s.get('premiereDate') or '9999-99-99')
         result['next_season_start'] = next_s.get('premiereDate', '')
+        result['current_season']   = str(next_s.get('number', ''))
         end = next_s.get('endDate')
         if end:
             result['next_season_date'] = end
@@ -402,7 +408,7 @@ def omdb_fetch(imdb_id: str) -> dict:
 
 
 def needs_omdb(fm: dict) -> bool:
-    return not fm.get('omdb_last_checked')
+    return not fm.get('omdb_last_checked') or not fm.get('poster')
 
 
 # ---------------------------------------------------------------------------
@@ -482,6 +488,7 @@ def tv_fields(imdb_id, row_rt, row_wl, status, date_w) -> list:
         ('show_type',            ''),
         ('premiered',            ''),
         ('ended',                ''),
+        ('poster',               ''),
     ]
     if date_w:
         fields.insert(fields.index(('series_status', '')), ('date_watched', date_w))
@@ -567,6 +574,8 @@ def process(
             for k, v in tvmaze_result.items():
                 if k == 'summary':
                     continue
+                if not v and fm.get(k):
+                    continue  # preserve manually set values when TVmaze has nothing
                 if k not in fm or str(fm.get(k, '')) != str(v):
                     updates[k] = v
                     changed = True
@@ -587,13 +596,20 @@ def process(
 
         # Check whether body needs updating
         _, cur_body = read_frontmatter(content)
-        needs_body_update = False
+        poster_url = updates.get('poster') or fm.get('poster', '')
+        body_has_poster = cur_body.lstrip('\n').startswith('![')
+        needs_full_body_rebuild = False
+        needs_poster_prepend = False
         if is_tv and tvmaze_result.get('summary') and cur_body.strip() == TV_SEASON_TABLE.strip():
-            needs_body_update = True
+            needs_full_body_rebuild = True
             changed = True
         if not is_tv and omdb_result.get('plot') and not cur_body.strip():
-            needs_body_update = True
+            needs_full_body_rebuild = True
             changed = True
+        if poster_url and not body_has_poster and not needs_full_body_rebuild:
+            needs_poster_prepend = True
+            changed = True
+        needs_body_update = needs_full_body_rebuild or needs_poster_prepend
 
         # Re-resolve TV status whenever we have series_status and a rating
         if is_tv:
@@ -622,14 +638,29 @@ def process(
                 if needs_body_update:
                     fm_match = FRONTMATTER_RE.match(content)
                     if fm_match:
-                        if is_tv:
+                        poster_part = '![](' + poster_url + ')\n\n' if poster_url else ''
+                        if needs_full_body_rebuild:
+                            if is_tv:
+                                summary = tvmaze_result.get('summary', '')
+                                content = (
+                                    content[:fm_match.end()]
+                                    + '\n' + poster_part
+                                    + (summary + '\n\n' if summary else '')
+                                    + TV_SEASON_TABLE
+                                )
+                            else:
+                                plot = omdb_result.get('plot', '')
+                                content = (
+                                    content[:fm_match.end()]
+                                    + '\n' + poster_part
+                                    + (plot + '\n' if plot else '')
+                                )
+                        elif needs_poster_prepend:
                             content = (
                                 content[:fm_match.end()]
-                                + '\n' + tvmaze_result['summary'] + '\n\n'
-                                + TV_SEASON_TABLE
+                                + '\n' + poster_part
+                                + cur_body.lstrip('\n')
                             )
-                        else:
-                            content = content[:fm_match.end()] + '\n' + omdb_result['plot'] + '\n'
                 existing_path.write_text(content, encoding='utf-8')
             stats['updated'] += 1
         else:
@@ -656,8 +687,9 @@ def process(
                     stats['tvmaze_calls'] += 1
                     tvmaze_keys = {
                         'tvmaze_id', 'total_seasons', 'series_status',
-                        'next_season_start', 'next_season_date', 'tvmaze_last_checked',
-                        'language', 'network', 'country', 'show_type', 'premiered', 'ended',
+                        'current_season', 'poster', 'next_season_start', 'next_season_date',
+                        'tvmaze_last_checked', 'language', 'network', 'country',
+                        'show_type', 'premiered', 'ended',
                     }
                     fields = [(k, tvmaze.get(k, v) if k in tvmaze_keys and tvmaze.get(k) else v)
                               for k, v in fields]
@@ -675,10 +707,12 @@ def process(
                 inferred = infer_following(fields_dict.get('series_status', ''), fields_dict.get('my_rating', ''))
                 if inferred:
                     fields = [(k, inferred if k == 'following' else v) for k, v in fields]
+                tv_poster = dict(fields).get('poster', '')
+                poster_part = '![](' + tv_poster + ')\n\n' if tv_poster else ''
                 if tvmaze_summary:
-                    body = '\n\n' + tvmaze_summary + '\n\n' + TV_SEASON_TABLE
+                    body = '\n' + poster_part + tvmaze_summary + '\n\n' + TV_SEASON_TABLE
                 else:
-                    body = '\n\n' + TV_SEASON_TABLE
+                    body = '\n' + poster_part + TV_SEASON_TABLE
                 content = format_frontmatter(fields) + body
             else:
                 fields = movie_fields(imdb_id, row_rt, row_wl, status, date_w)
@@ -695,9 +729,11 @@ def process(
                     fields = [(k, omdb.get(k, v) if k in omdb_keys and omdb.get(k) else v)
                               for k, v in fields]
                     omdb_plot = omdb.get('plot', '')
+                movie_poster = dict(fields).get('poster', '')
+                poster_part = '![](' + movie_poster + ')\n\n' if movie_poster else ''
                 content = format_frontmatter(fields) + '\n'
-                if omdb_plot:
-                    content += '\n' + omdb_plot + '\n'
+                if poster_part or omdb_plot:
+                    content += '\n' + poster_part + (omdb_plot + '\n' if omdb_plot else '')
 
             dest.write_text(content, encoding='utf-8')
             existing[imdb_id] = dest

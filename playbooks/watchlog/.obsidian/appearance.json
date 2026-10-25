@@ -1,5 +1,6 @@
 {
   "enabledCssSnippets": [
-    "bases-row-hover"
+    "bases-row-hover",
+    "active-seasons"
   ]
 }

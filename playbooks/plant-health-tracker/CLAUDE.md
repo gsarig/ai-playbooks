@@ -27,7 +27,10 @@ Works well for typical sessions (3–8 photos). For large batches or unattended/
 
 - Reports are written with structural labels in English
 - AI-generated text (summaries, observations, care advice) is written in the language set in `config.json` → `reportLanguage` (default: English)
-- Frontmatter fields: `species`, `common_name`, `plant_id`, `health_status`, `urgency`, `location`, `vessel`, `first_seen`, `last_seen`, `tags`
+- Frontmatter fields: `species`, `common_name`, `plant_id`, `health_status`, `urgency`, `location`, `vessel`, `drainage_holes`, `light`, `pot_material`, `first_seen`, `last_seen`, `tags`
+- `drainage_holes`: true/false, whether the pot has drainage holes; stable, so do not re-assess it from photos once set
+- `light`: light conditions, e.g. "Bright indirect light", "Direct sun", "Low light"; stable unless the location changes
+- `pot_material`: e.g. "Plastic", "Terracotta", "Ceramic"; relevant because terracotta dries out faster than plastic or ceramic
 - `## Health History` — DataviewJS health trend chart (reads `_history/<plantId>.json`)
 - `## History` — reverse-chronological timeline; each entry has embedded photos, health status, summary, and care advice
 
@@ -46,3 +49,19 @@ Dashboard.md           auto-generated; regenerated on every scan
 
 - **Dataview** — powers live tables in Dashboard.md and the health chart
 - **Charts** — renders the health trend chart via `window.renderChart`
+
+## Health scoring rules
+
+Apply these on every scan, without exception:
+
+**1. Stagnation counts as decline.**
+If a plant's health score has not improved over 3 consecutive history entries, drop the score by one level and set urgency to "Act Soon." A plant not getting better is getting worse, so holding the score flat misrepresents the situation. Before writing a health score, check the last 3 entries in `_history/<plantId>.json`.
+
+**2. Visual threshold for Poor vs Fair.**
+If bare or leafless branches account for more than roughly half the plant's visible structure, the rating is Poor, not Fair.
+
+**3. No recovery language without visible evidence.**
+Words like "slow recovery," "stable improvement," or "signs of recovery" only appear in a summary if that session's photos show something concrete: new leaves, visibly fuller growth, measurable change from the previous entry. If nothing changed, the summary says nothing changed.
+
+**4. Assess the full system, not just the plant.**
+Every scan entry must consider the whole setup, not only visible plant health. Explicitly check: pot size relative to the plant and root ball, soil condition and moisture retention, drainage, light conditions, and environment. If anything looks wrong, flag it, even if the user didn't ask. The plant's health cannot be assessed in isolation from its container and conditions.

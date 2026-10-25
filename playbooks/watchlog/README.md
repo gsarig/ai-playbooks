@@ -150,6 +150,27 @@ watchlog/
 
 **Browsing:** open `Views/Movies.base` or `Views/TV Shows.base` for the filterable Bases views. Open `Views/_Dashboard.md` for the charts.
 
+### import.py options
+
+```
+--ratings <path>     IMDB ratings CSV (default: imports/ratings.csv)
+--watchlist <path>   IMDB watchlist CSV (default: imports/watchlist.csv)
+--vault <path>       Vault root (default: repo root)
+--tvmaze             Fetch TVmaze data for TV shows
+--omdb               Fetch OMDB data for movies (requires OMDB_API_KEY in .env)
+--dry-run            Parse and report only: no files written, no API calls
+--limit N            Process only the first N entries (for testing)
+--ttl-days N         Days before re-checking ongoing shows via TVmaze (default: 30)
+```
+
+Run `--dry-run --limit 5` first to verify output before a full run.
+
+### API caching
+
+**TVmaze:** data is stored in each TV show's frontmatter. Ended shows are never re-queried. Ongoing shows are re-queried only when `tvmaze_last_checked` is older than `--ttl-days`. New fields (language, network, country, poster and so on) trigger a one-time backfill on the next `--tvmaze` run.
+
+**OMDB:** fetched once per movie, gated on `omdb_last_checked`, plus once more for a movie that still has no poster. Re-runs skip already-enriched notes.
+
 ---
 
 ## Note frontmatter
@@ -159,3 +180,5 @@ watchlog/
 **TV shows** — all of the above (minus movie-only fields) plus `tvmaze_id`, `total_seasons`, `series_status`, `following`, `current_season`, `last_season_watched`, `next_season_start`, `next_season_date`, `tvmaze_last_checked`, `network`, `show_type`, `premiered`, `ended`
 
 **Status values** — `watched`, `watching`, `to-watch`, `to-rewatch`
+
+**Status logic:** no personal rating means `to-watch`. A rated movie is `watched`. A rated TV show is `watching` if the series is ongoing and rated 6+; `watched` if it has ended or is rated below 6.

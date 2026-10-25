@@ -105,6 +105,7 @@ async function processSession(filePaths) {
   }
 
   const warnings = [...result.uncertainties];
+  const newPlants = [];
 
   for (const analysis of result.plants) {
     const indices = Array.isArray(analysis.imageIndices) && analysis.imageIndices.length > 0
@@ -132,6 +133,7 @@ async function processSession(filePaths) {
         trend:          'N/A',
       };
       console.log(`  New plant: ${plantId} (${analysis.species})`);
+      newPlants.push({ id: plantId, label: analysis.commonName || analysis.species });
 
       if (analysis.confidence === 'low') {
         const reason = analysis.uncertaintyNote || 'Low identification confidence';
@@ -194,7 +196,7 @@ async function processSession(filePaths) {
     saveRegistry(VAULT_PATH, registry);
   }
 
-  updateDashboard(VAULT_PATH, loadRegistry(VAULT_PATH), warnings);
+  updateDashboard(VAULT_PATH, loadRegistry(VAULT_PATH), warnings, newPlants);
   console.log('  Dashboard updated.');
 
   if (warnings.length > 0) {

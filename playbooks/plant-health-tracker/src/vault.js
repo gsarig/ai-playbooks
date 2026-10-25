@@ -298,7 +298,14 @@ function urgencyCallout(urgency) {
 // Dashboard
 // ---------------------------------------------------------------------------
 
-export function updateDashboard(vaultPath, registry, pendingWarnings) {
+/**
+ * @param {string}   vaultPath
+ * @param {object}   registry
+ * @param {string[]} pendingWarnings
+ * @param {{id: string, label: string}[]} newPlants - plants first registered in
+ *   this run; listed in their own section, which is left out when empty
+ */
+export function updateDashboard(vaultPath, registry, pendingWarnings, newPlants = []) {
   const plants = Object.entries(registry).filter(([k]) => !k.startsWith('_'));
   const scanDate = new Date().toLocaleDateString('en-GB', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
@@ -319,22 +326,27 @@ export function updateDashboard(vaultPath, registry, pendingWarnings) {
       ].join('\n')
     : '> [!success] All good\n> Nothing needs your attention right now.\n';
 
+  const newPlantsBlock = newPlants.length > 0
+    ? `## New Plants This Session\n\n${newPlants.map(p => `- **${p.id}**: ${p.label}`).join('\n')}\n\n`
+    : '';
+
+  // Every table leads with a link to the plant's report, labelled by its title.
   const allPlantsQuery = `\`\`\`dataview
-TABLE species AS "Species", health_status AS "Health", last_seen AS "Last recorded", location AS "Location"
+TABLE WITHOUT ID link(file.path, title) AS "Plant", health_status AS "Health", last_seen AS "Last recorded", location AS "Location"
 FROM ""
 WHERE contains(tags, "plant")
 SORT last_seen DESC
 \`\`\``;
 
   const attentionQuery = `\`\`\`dataview
-TABLE species AS "Species", health_status AS "Health", urgency AS "Urgency", last_seen AS "Last recorded"
+TABLE WITHOUT ID link(file.path, title) AS "Plant", health_status AS "Health", urgency AS "Urgency", last_seen AS "Last recorded"
 FROM ""
 WHERE contains(tags, "plant") AND contains(list("Fair","Poor","Critical"), health_status)
 SORT last_seen DESC
 \`\`\``;
 
   const wateringQuery = `\`\`\`dataview
-TABLE last_watered AS "Last watered", watering_interval_days AS "Interval (days)",
+TABLE WITHOUT ID link(file.path, title) AS "Plant", last_watered AS "Last watered", watering_interval_days AS "Interval (days)",
   (date(today) - date(last_watered)).days AS "Days since"
 FROM ""
 WHERE contains(tags, "plant")
@@ -362,7 +374,7 @@ ${warningsBlock}
 | Need attention | ${needsAttention.length} |
 | Last scan | ${scanDate} |
 
-## All Plants
+${newPlantsBlock}## All Plants
 
 ${allPlantsQuery}
 
@@ -377,7 +389,7 @@ ${wateringQuery}
 ## Recent Activity
 
 \`\`\`dataview
-TABLE file.mtime AS "Updated", health_status AS "Health"
+TABLE WITHOUT ID link(file.path, title) AS "Plant", file.mtime AS "Updated", health_status AS "Health"
 FROM ""
 WHERE contains(tags, "plant")
 SORT file.mtime DESC
