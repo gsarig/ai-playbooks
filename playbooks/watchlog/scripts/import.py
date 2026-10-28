@@ -3,7 +3,11 @@
 Watchlog import script.
 
 Usage:
-    python3 scripts/import.py --ratings <csv> --watchlist <csv> [--tvmaze] [--omdb] [--ttl-days N]
+    python3 scripts/import.py --ratings <csv> --watchlist <csv> [--tvmaze] [--omdb] [--ttl-days N] [--force-stale]
+    python3 scripts/import.py --tvmaze-only [--ttl-days N]
+
+CSVs older than STALE_CSV_HOURS are refused unless --force-stale. --tvmaze-only skips the
+CSVs and refreshes TVmaze fields on TV notes only (the nightly cron run).
 
 On each run:
 - New entries are created as notes.
@@ -49,6 +53,7 @@ TYPE_MAP = {
 TVMAZE_RATE = 0.55   # seconds between requests (~20 req/10 s)
 OMDB_RATE   = 0.5    # seconds between requests
 DEFAULT_TTL  = 30    # days before re-checking ongoing shows
+STALE_CSV_HOURS = 24 # CSV exports older than this are refused without --force-stale
 
 
 # ---------------------------------------------------------------------------
@@ -498,6 +503,21 @@ def tv_fields(imdb_id, row_rt, row_wl, status, date_w) -> list:
 TV_SEASON_TABLE = "| Season | Last episode | Watched |\n| --- | --- | --- |\n"
 
 
+def rebuild_body(content: str, cur_body: str, poster_url: str, is_tv: bool, text: str, full: bool) -> str:
+    """Rewrite the note body below the frontmatter. full=True replaces it with poster,
+    summary (TV) or plot (movie), and for TV the season table; otherwise the poster is
+    prepended to the existing body."""
+    fm_match = FRONTMATTER_RE.match(content)
+    if not fm_match:
+        return content
+    poster_part = '![](' + poster_url + ')\n\n' if poster_url else ''
+    if not full:
+        return content[:fm_match.end()] + '\n' + poster_part + cur_body.lstrip('\n')
+    if is_tv:
+        return content[:fm_match.end()] + '\n' + poster_part + (text + '\n\n' if text else '') + TV_SEASON_TABLE
+    return content[:fm_match.end()] + '\n' + poster_part + (text + '\n' if text else '')
+
+
 # ---------------------------------------------------------------------------
 # Core processing
 # ---------------------------------------------------------------------------
@@ -636,31 +656,8 @@ def process(
                 for k, v in updates.items():
                     content = update_field(content, k, v)
                 if needs_body_update:
-                    fm_match = FRONTMATTER_RE.match(content)
-                    if fm_match:
-                        poster_part = '![](' + poster_url + ')\n\n' if poster_url else ''
-                        if needs_full_body_rebuild:
-                            if is_tv:
-                                summary = tvmaze_result.get('summary', '')
-                                content = (
-                                    content[:fm_match.end()]
-                                    + '\n' + poster_part
-                                    + (summary + '\n\n' if summary else '')
-                                    + TV_SEASON_TABLE
-                                )
-                            else:
-                                plot = omdb_result.get('plot', '')
-                                content = (
-                                    content[:fm_match.end()]
-                                    + '\n' + poster_part
-                                    + (plot + '\n' if plot else '')
-                                )
-                        elif needs_poster_prepend:
-                            content = (
-                                content[:fm_match.end()]
-                                + '\n' + poster_part
-                                + cur_body.lstrip('\n')
-                            )
+                    text = tvmaze_result.get('summary', '') if is_tv else omdb_result.get('plot', '')
+                    content = rebuild_body(content, cur_body, poster_url, is_tv, text, needs_full_body_rebuild)
                 existing_path.write_text(content, encoding='utf-8')
             stats['updated'] += 1
         else:
@@ -776,6 +773,55 @@ def write_standout(episodes: list, vault: Path) -> None:
     print(f'  Standout Episodes: +{len(new_lines)} entries')
 
 
+def refresh_tvmaze(vault: Path, ttl: int, stats: dict, dry_run: bool = False) -> None:
+    """--tvmaze-only: refresh TVmaze fields on TV notes, without the CSVs.
+
+    Writes only the fields tvmaze_fetch returns, plus the summary/poster body. Status,
+    ratings, date_watched and following are never touched: with the IMDB userscript
+    recording ratings and watchlist state, the nightly run must not second-guess them.
+    """
+    for md in sorted((vault / 'TV Shows').glob('*.md')):
+        if md.name.startswith('_'):
+            continue
+        content = md.read_text(encoding='utf-8')
+        fm, cur_body = read_frontmatter(content)
+        imdb_id = fm.get('imdb_id', '')
+        if not imdb_id.startswith('tt') or not needs_tvmaze(fm, ttl):
+            stats['skipped'] += 1
+            continue
+        title = fm.get('title', '')
+        print(f"    TVmaze: {title}")
+        if dry_run:
+            stats['updated'] += 1
+            continue
+        stored_id = int(fm['tvmaze_id']) if fm.get('tvmaze_id') else None
+        result = tvmaze_fetch(imdb_id, title, tvmaze_id=stored_id)
+        time.sleep(TVMAZE_RATE)
+        stats['tvmaze_calls'] += 1
+
+        updates = {}
+        for k, v in result.items():
+            if k == 'summary':
+                continue
+            if not v and fm.get(k):
+                continue  # preserve manually set values when TVmaze has nothing
+            if k not in fm or str(fm.get(k, '')) != str(v):
+                updates[k] = v
+
+        poster_url = updates.get('poster') or fm.get('poster', '')
+        full = bool(result.get('summary')) and cur_body.strip() == TV_SEASON_TABLE.strip()
+        prepend = bool(poster_url) and not cur_body.lstrip('\n').startswith('![') and not full
+        if not updates and not full and not prepend:
+            stats['skipped'] += 1
+            continue
+        for k, v in updates.items():
+            content = update_field(content, k, v)
+        if full or prepend:
+            content = rebuild_body(content, cur_body, poster_url, True, result.get('summary', ''), full)
+        md.write_text(content, encoding='utf-8')
+        stats['updated'] += 1
+
+
 def save_state(stats: dict, vault: Path) -> None:
     path = vault / '.import-state.json'
     runs = []
@@ -803,9 +849,13 @@ def main() -> None:
     p.add_argument('--limit',     type=int, default=None, help='Process only the first N entries (for testing)')
     p.add_argument('--ttl-days',  type=int, default=DEFAULT_TTL,
                    help=f'Days before re-checking ongoing shows (default {DEFAULT_TTL})')
+    p.add_argument('--tvmaze-only', action='store_true',
+                   help='Refresh TVmaze fields on TV notes only; no CSVs, never touches ratings or status')
+    p.add_argument('--force-stale', action='store_true',
+                   help=f'Import CSVs older than {STALE_CSV_HOURS} hours anyway')
     args = p.parse_args()
 
-    if args.tvmaze and not HAS_REQUESTS:
+    if (args.tvmaze or args.tvmaze_only) and not HAS_REQUESTS:
         sys.exit('Error: --tvmaze requires the requests library. pip install requests')
     if args.omdb and not HAS_REQUESTS:
         sys.exit('Error: --omdb requires the requests library. pip install requests')
@@ -819,12 +869,27 @@ def main() -> None:
     if args.omdb and not os.environ.get('OMDB_API_KEY'):
         sys.exit('Error: --omdb requires OMDB_API_KEY in .env')
 
+    if args.tvmaze_only:
+        stats = {'added': 0, 'updated': 0, 'skipped': 0, 'tvmaze_calls': 0, 'omdb_calls': 0, 'errors': 0}
+        print('Refreshing TVmaze fields...')
+        refresh_tvmaze(vault, args.ttl_days, stats, dry_run=args.dry_run)
+        if not args.dry_run:
+            save_state({'mode': 'tvmaze-only', **stats}, vault)
+        print(f'\nDone. Updated: {stats["updated"]:,}, skipped: {stats["skipped"]:,}, TVmaze calls: {stats["tvmaze_calls"]:,}')
+        return
+
     ratings_path   = args.ratings   or str(vault / 'imports' / 'ratings.csv')
     watchlist_path = args.watchlist or str(vault / 'imports' / 'watchlist.csv')
 
     for path, label in [(ratings_path, 'ratings'), (watchlist_path, 'watchlist')]:
         if not Path(path).exists():
             sys.exit(f'Error: {label} CSV not found at {path}')
+        # The userscript keeps notes current between exports, so an old export would
+        # roll back every rating and status recorded since it was taken.
+        age_h = (time.time() - Path(path).stat().st_mtime) / 3600
+        if age_h > STALE_CSV_HOURS and not (args.force_stale or args.dry_run):
+            sys.exit(f'Error: {label} CSV at {path} is {age_h / 24:.0f} days old. '
+                     f'Export fresh CSVs from IMDB first, or pass --force-stale.')
 
     print('Parsing CSVs...')
     rt_rows = parse_csv(ratings_path)

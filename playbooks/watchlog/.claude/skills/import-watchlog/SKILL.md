@@ -9,7 +9,7 @@ allowed-tools: Bash(python3 *) Bash(git *) Read
 
 ### 1. Verify the CSV files are in place
 
-Check that both `imports/ratings.csv` and `imports/watchlist.csv` exist at the vault root. If either is missing, stop and tell the user exactly what to do:
+Check that both `imports/ratings.csv` and `imports/watchlist.csv` exist at the vault root and are less than a day old: `import.py` refuses older files, since they would roll back the ratings and status the IMDB userscript recorded after the export. Never pass `--force-stale` unless the user asks for it. If either is missing or older, stop and tell the user exactly what to do:
 - Export Your Ratings and Your Watchlist from IMDB (both as CSV)
 - Rename them to `ratings.csv` and `watchlist.csv`
 - Drop them in the `imports/` folder

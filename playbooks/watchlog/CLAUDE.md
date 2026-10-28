@@ -11,4 +11,5 @@ Personal vault for tracking movies and TV shows, enriched with IMDB, TVmaze, and
 - `.env` — contains your OMDB API key
 - `imports/*.csv` — your personal IMDB export files
 - `.import-state.json` — local run history
+- `_data/` — userscript observation files, applied and then deleted by the queue processor
 - `Movies/` and `TV Shows/` notes — personal viewing data (if this is your live vault, not the playbook template)

@@ -4,5 +4,6 @@
 .import-state.json
 imports/*.csv
 .DS_Store
-scripts/__pycache__/
+__pycache__/
 .env
+_data/

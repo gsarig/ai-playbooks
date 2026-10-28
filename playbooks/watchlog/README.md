@@ -102,7 +102,25 @@ The queue processor runs `_Queue.md` automatically. To set it up:
    */15 * * * * /absolute/path/to/watchlog/scripts/watchlog_queue.sh
    ```
 
-### Step 6 — Set up Obsidian Web Clipper (optional)
+### Step 6 — Install the IMDB userscript (recommended)
+
+`userscript/imdb-sync.js` records your IMDB ratings and watchlist changes as you browse, so you never export CSVs again. It runs in Edge or Chrome through [Tampermonkey](https://www.tampermonkey.net/). While you are logged in to IMDB, every title page you open, and every row on your watchlist and ratings pages, is saved as a small JSON file in `_data/imdb/`. It makes no requests, never clicks, and records nothing when you are logged out or the page has not finished loading your data. The queue cron job from step 5 applies the files within 15 minutes:
+
+- A rating sets `my_rating`; a movie becomes `watched`, a TV show follows the status logic below. `date_watched` is the "Rated on" date from your ratings page, or the day it was seen, and is never overwritten.
+- A title added to your watchlist that has no note yet is created as `to-watch`.
+- An unrated title taken off your watchlist becomes `removed`; re-adding it sets it back to `to-watch`.
+- If IMDB shows no rating for a title the vault has rated, nothing changes and a line in `_actions/actions.md` asks you to check it.
+- IMDB decides only your rating and watchlist membership. `following`, `last_season_watched` and the other local fields are never touched.
+
+To install:
+
+1. Turn on Tampermonkey's "Allow access to file URLs" (the browser's extensions page, Tampermonkey, Details).
+2. Edit the `@require` line in `userscript/stub.user.js` to the absolute path of `userscript/imdb-sync.js` on your machine, then install the stub in Tampermonkey.
+3. Create the folder `_data/imdb` in the vault, open any IMDB title page, and pick that folder when the bottom-right button asks. A folder with any other name is refused.
+4. After each browser restart, the first IMDB page shows an "Allow" button once. Choose "Allow on every visit" to skip it.
+5. In Obsidian: Settings, Files and links, Excluded files, add `_data/`.
+
+### Step 7 — Set up Obsidian Web Clipper (optional)
 
 Import the pre-made template to add entries from IMDB with one click:
 
@@ -128,6 +146,8 @@ watchlog/
     _Movies Dashboard.md        Movies-only stats and charts
     _TV Shows Dashboard.md      TV-only stats and charts
   imports/                      drop IMDB CSV exports here (gitignored)
+  _data/imdb/                   observation files from the userscript (gitignored)
+  userscript/                   Tampermonkey userscript: imdb-sync.js plus the stub you install
   scripts/
     import.py                   bulk import and sync from IMDB CSV exports
     process_queues.py           queue processor
@@ -142,7 +162,7 @@ watchlog/
 
 ## Usage
 
-**Day-to-day:** navigate to an IMDB title page, click the Web Clipper extension. The entry appears in `_Queue.md` and the cron job processes it within 15 minutes, creating the note and populating all metadata.
+**Day-to-day:** with the userscript installed, just rate and add titles on IMDB. Without it, navigate to an IMDB title page and click the Web Clipper extension. The entry appears in `_Queue.md` and the cron job processes it within 15 minutes, creating the note and populating all metadata.
 
 **Rating after watching:** click the Web Clipper after rating on IMDB (the template reads your star score), or edit `_Queue.md` directly by appending `URL :: score`.
 
@@ -161,9 +181,19 @@ watchlog/
 --dry-run            Parse and report only: no files written, no API calls
 --limit N            Process only the first N entries (for testing)
 --ttl-days N         Days before re-checking ongoing shows via TVmaze (default: 30)
+--tvmaze-only        Refresh TVmaze fields on TV notes only: no CSVs, never touches ratings or status
+--force-stale        Import CSVs older than 24 hours anyway
 ```
 
 Run `--dry-run --limit 5` first to verify output before a full run.
+
+The import refuses CSV files more than 24 hours old: with the userscript, notes can be newer than an old export, and importing it would roll their ratings and status back. Export fresh CSVs first, or pass `--force-stale` when you mean it.
+
+To keep season dates current without any CSV, add a nightly cron job that re-checks each running show at most once a week:
+
+```
+30 23 * * * /usr/bin/python3 /absolute/path/to/watchlog/scripts/import.py --tvmaze-only --ttl-days 7 >> "$HOME/watchlog_tvmaze.log" 2>&1
+```
 
 ### API caching
 
@@ -179,6 +209,6 @@ Run `--dry-run --limit 5` first to verify output before a full run.
 
 **TV shows** — all of the above (minus movie-only fields) plus `tvmaze_id`, `total_seasons`, `series_status`, `following`, `current_season`, `last_season_watched`, `next_season_start`, `next_season_date`, `tvmaze_last_checked`, `network`, `show_type`, `premiered`, `ended`
 
-**Status values** — `watched`, `watching`, `to-watch`, `to-rewatch`
+**Status values** — `watched`, `watching`, `to-watch`, `to-rewatch`, `removed` (an unrated title taken off the IMDB watchlist)
 
 **Status logic:** no personal rating means `to-watch`. A rated movie is `watched`. A rated TV show is `watching` if the series is ongoing and rated 6+; `watched` if it has ended or is rated below 6.

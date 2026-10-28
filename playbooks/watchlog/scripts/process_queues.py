@@ -9,11 +9,15 @@ Each line is either:
   https://www.imdb.com/title/ttXXXXXXX/           → add to watchlist
   https://www.imdb.com/title/ttXXXXXXX/ :: 8      → add/update with rating
 
+Then applies the observation files the IMDB userscript writes to _data/imdb/
+(see process_observations and userscript/imdb-sync.js).
+
 Usage:
     python3 scripts/process_queues.py [--dry-run]
 """
 
 import importlib.util
+import json
 import os
 import re
 import sys
@@ -239,8 +243,10 @@ def _tv_fields(imdb_id: str, omdb: dict, tvmaze: dict, my_rating: str, status: s
 # Note creation
 # ---------------------------------------------------------------------------
 
-def create_note(imdb_id: str, my_rating: str, existing: dict, stats: dict, dry_run: bool) -> bool:
-    """Fetch metadata and write a new note. Returns True on success, False to keep in queue."""
+def create_note(imdb_id: str, my_rating: str, existing: dict, stats: dict, dry_run: bool,
+                date_watched: str = '') -> bool | None:
+    """Fetch metadata and write a new note. Returns True on success, False to retry later
+    (OMDB unavailable), None for a title that never gets a note (an episode)."""
     print(f"  Creating: {imdb_id}")
 
     # Detect type via TVmaze (free, no quota). Movies return None.
@@ -248,7 +254,7 @@ def create_note(imdb_id: str, my_rating: str, existing: dict, stats: dict, dry_r
     time.sleep(vi.TVMAZE_RATE)
     is_tv = tv_show is not None
 
-    date_w = str(date.today()) if my_rating else ''
+    date_w = (date_watched or str(date.today())) if my_rating else ''
 
     if is_tv:
         title = tv_show.get('name') or imdb_id
@@ -291,7 +297,7 @@ def create_note(imdb_id: str, my_rating: str, existing: dict, stats: dict, dry_r
         if omdb.get('omdb_type') == 'episode':
             print(f"  Skipping episode: {imdb_id}")
             stats['skipped'] += 1
-            return False
+            return None
 
         title  = omdb.get('title') or imdb_id
         year   = omdb.get('year') or 'unknown'
@@ -314,6 +320,191 @@ def create_note(imdb_id: str, my_rating: str, existing: dict, stats: dict, dry_r
 
     stats['added'] += 1
     return True
+
+
+def apply_rating(note_path: Path, imdb_id: str, my_rating: str, date_w: str, stats: dict, dry_run: bool) -> None:
+    """Set my_rating on an existing note, with the status that follows from it.
+
+    date_watched is only filled when empty, so a re-rating keeps the original date.
+    Shared by the queue and the userscript observations, so both apply one rule."""
+    note_content = note_path.read_text(encoding='utf-8')
+    fm, _        = vi.read_frontmatter(note_content)
+    existing_rating = fm.get('my_rating', '')
+
+    if existing_rating == my_rating:
+        print(f"  Rating unchanged ({my_rating}): {imdb_id}")
+        stats['skipped'] += 1
+        return
+
+    print(f"  Updating rating {existing_rating or '—'} → {my_rating}: {imdb_id}")
+    updates = {'my_rating': my_rating}
+
+    if not fm.get('date_watched'):
+        updates['date_watched'] = date_w
+
+    if fm.get('series_status') is not None:
+        series_status = fm.get('series_status', '')
+        resolved = vi.resolve_tv_status(
+            fm.get('status', ''), series_status, my_rating
+        )
+        if resolved != fm.get('status', ''):
+            updates['status'] = resolved
+    else:
+        updates['status'] = 'watched'
+
+    if not dry_run:
+        for k, v in updates.items():
+            note_content = vi.update_field(note_content, k, v)
+        note_path.write_text(note_content, encoding='utf-8')
+
+    stats['updated'] += 1
+
+
+# ---------------------------------------------------------------------------
+# Userscript observations (_data/imdb/*.json, written by userscript/imdb-sync.js)
+# ---------------------------------------------------------------------------
+
+OBS_SUBDIR      = Path('_data') / 'imdb'
+OBS_KEEP_DAYS   = 30
+DATE_RE         = re.compile(r'^\d{4}-\d{2}-\d{2}$')
+IMDB_ONLY_RE    = re.compile(r'^tt\d+$')
+ACTIONS_HEADER  = (
+    '# Actions\n\n'
+    'Things to do in or for this vault, not build (that goes in `_backlog/backlog.md`). '
+    'Tick items off in Obsidian; Claude moves ticked items, with their indented lines, to '
+    '`actions-done.md` in this folder the next time it edits this file.\n\n'
+)
+
+
+def parse_observation(text: str) -> tuple[str, list[dict]]:
+    """Return (source, items) from one observation file, or raise ValueError.
+
+    Each item: imdb_id; rating, an int 1-10 or None (IMDB showed it unrated);
+    in_watchlist, a bool or None (not read); rated_on, an ISO date or ''."""
+    data = json.loads(text)
+    if not isinstance(data, dict) or data.get('version') != 1:
+        raise ValueError('unknown version')
+    items = []
+    for raw in data.get('items') or []:
+        imdb_id = raw.get('imdb_id', '')
+        rating  = raw.get('rating')
+        in_wl   = raw.get('in_watchlist')
+        rated   = raw.get('rated_on') or ''
+        if not IMDB_ONLY_RE.match(str(imdb_id)):
+            raise ValueError(f'bad imdb_id {imdb_id!r}')
+        if rating is not None and (not isinstance(rating, int) or isinstance(rating, bool) or not 1 <= rating <= 10):
+            raise ValueError(f'bad rating {rating!r} for {imdb_id}')
+        if in_wl is not None and not isinstance(in_wl, bool):
+            raise ValueError(f'bad in_watchlist {in_wl!r} for {imdb_id}')
+        if rated and not DATE_RE.match(rated):
+            raise ValueError(f'bad rated_on {rated!r} for {imdb_id}')
+        items.append({'imdb_id': imdb_id, 'rating': rating, 'in_watchlist': in_wl, 'rated_on': rated})
+    return str(data.get('source', '')), items
+
+
+def flag_unrated(vault: Path, imdb_id: str, title: str, local_rating: str, dry_run: bool) -> None:
+    """IMDB shows no rating but the note has one: never guess which is right, ask.
+    One open line per title; a second sighting adds nothing."""
+    path = vault / '_actions' / 'actions.md'
+    text = path.read_text(encoding='utf-8') if path.exists() else ''
+    if any(imdb_id in l for l in text.splitlines() if l.lstrip().startswith('- [ ]')):
+        return
+    line = (f'- [ ] {title or imdb_id} ({imdb_id}): IMDB shows no rating, the vault has {local_rating}. '
+            f'Check which is right. ➕ {date.today()}\n')
+    print(f"  Flagged: {imdb_id} unrated on IMDB, {local_rating} in the vault")
+    if dry_run:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    text = text or ACTIONS_HEADER
+    if not text.endswith('\n'):
+        text += '\n'
+    path.write_text(text + line, encoding='utf-8')
+
+
+def apply_observation(vault: Path, item: dict, existing: dict, stats: dict, dry_run: bool) -> bool:
+    """Apply one observed title. Returns False when it must be retried (OMDB unavailable).
+
+    IMDB decides only my_rating and watchlist membership; following, last_season_watched
+    and the rest are never written here."""
+    imdb_id, rating, in_wl = item['imdb_id'], item['rating'], item['in_watchlist']
+    note = existing.get(imdb_id)
+
+    if note is None:
+        if rating is not None:
+            return create_note(imdb_id, str(rating), existing, stats, dry_run, item['rated_on']) is not False
+        if in_wl:
+            return create_note(imdb_id, '', existing, stats, dry_run) is not False
+        return True  # a title you only looked at
+
+    if rating is not None:
+        apply_rating(note, imdb_id, str(rating), item['rated_on'] or str(date.today()), stats, dry_run)
+        return True
+
+    content = note.read_text(encoding='utf-8')
+    fm, _ = vi.read_frontmatter(content)
+    if fm.get('my_rating'):
+        flag_unrated(vault, imdb_id, fm.get('title', ''), fm['my_rating'], dry_run)
+        stats['flagged'] = stats.get('flagged', 0) + 1
+        return True
+
+    status = fm.get('status', '')
+    new = 'to-watch' if (in_wl is True and status == 'removed') else \
+          'removed'  if (in_wl is False and status == 'to-watch') else None
+    if new:
+        print(f"  Status {status} → {new}: {imdb_id}")
+        if not dry_run:
+            note.write_text(vi.update_field(content, 'status', new), encoding='utf-8')
+        stats['updated'] += 1
+    return True
+
+
+def process_observations(vault: Path, existing: dict, stats: dict, dry_run: bool) -> None:
+    """Apply every observation file in name order (the names start with the time seen).
+
+    A file whose items all applied moves to processed/. One with items left to retry is
+    rewritten to hold only those, so a later run never replays an older rating over a
+    newer one. An unreadable file moves to failed/."""
+    obs_dir = vault / OBS_SUBDIR
+    if not obs_dir.is_dir():
+        return
+    files = sorted(obs_dir.glob('*.json'))
+    if files:
+        print(f"Observations: {len(files)} file{'' if len(files) == 1 else 's'}")
+    for f in files:
+        try:
+            _, items = parse_observation(f.read_text(encoding='utf-8'))
+        except (ValueError, OSError) as e:
+            print(f"  Unreadable {f.name}: {e}", file=sys.stderr)
+            stats['errors'] += 1
+            if not dry_run:
+                (obs_dir / 'failed').mkdir(exist_ok=True)
+                f.replace(obs_dir / 'failed' / f.name)
+            continue
+        retry = []
+        for item in items:
+            try:
+                if not apply_observation(vault, item, existing, stats, dry_run):
+                    retry.append(item)
+            except Exception as e:
+                print(f"  Error {item['imdb_id']}: {e}", file=sys.stderr)
+                stats['errors'] += 1
+                retry.append(item)
+        if dry_run:
+            continue
+        if retry:
+            data = json.loads(f.read_text(encoding='utf-8'))
+            data['items'] = [i for i in data['items'] if i.get('imdb_id') in {r['imdb_id'] for r in retry}]
+            f.write_text(json.dumps(data), encoding='utf-8')
+        else:
+            (obs_dir / 'processed').mkdir(exist_ok=True)
+            f.replace(obs_dir / 'processed' / f.name)
+
+    done = obs_dir / 'processed'
+    if done.is_dir() and not dry_run:
+        cutoff = time.time() - OBS_KEEP_DAYS * 86400
+        for old in done.glob('*.json'):
+            if old.stat().st_mtime < cutoff:
+                old.unlink()
 
 
 # ---------------------------------------------------------------------------
@@ -354,39 +545,7 @@ def process_queue(existing: dict, stats: dict, dry_run: bool) -> None:
                     processed.append(line)
                     continue
 
-                note_path    = existing[imdb_id]
-                note_content = note_path.read_text(encoding='utf-8')
-                fm, _        = vi.read_frontmatter(note_content)
-                existing_rating = fm.get('my_rating', '')
-
-                if existing_rating == my_rating:
-                    print(f"  Rating unchanged ({my_rating}): {imdb_id}")
-                    stats['skipped'] += 1
-                    processed.append(line)
-                    continue
-
-                print(f"  Updating rating {existing_rating or '—'} → {my_rating}: {imdb_id}")
-                updates = {'my_rating': my_rating}
-
-                if not fm.get('date_watched'):
-                    updates['date_watched'] = str(date.today())
-
-                if fm.get('series_status') is not None:
-                    series_status = fm.get('series_status', '')
-                    resolved = vi.resolve_tv_status(
-                        fm.get('status', ''), series_status, my_rating
-                    )
-                    if resolved != fm.get('status', ''):
-                        updates['status'] = resolved
-                else:
-                    updates['status'] = 'watched'
-
-                if not dry_run:
-                    for k, v in updates.items():
-                        note_content = vi.update_field(note_content, k, v)
-                    note_path.write_text(note_content, encoding='utf-8')
-
-                stats['updated'] += 1
+                apply_rating(existing[imdb_id], imdb_id, my_rating, str(date.today()), stats, dry_run)
                 processed.append(line)
 
             else:
@@ -420,15 +579,18 @@ def main() -> None:
     existing = vi.scan_vault(VAULT_ROOT)
     print(f'  Existing notes: {len(existing):,}')
 
-    stats = {'added': 0, 'updated': 0, 'skipped': 0, 'errors': 0}
+    stats = {'added': 0, 'updated': 0, 'skipped': 0, 'errors': 0, 'flagged': 0}
 
     process_queue(existing, stats, args.dry_run)
+    process_observations(VAULT_ROOT, existing, stats, args.dry_run)
 
-    if stats['added'] or stats['updated'] or stats['errors']:
+    if stats['added'] or stats['updated'] or stats['errors'] or stats['flagged']:
         print(f"\nDone.")
         print(f"  Added:   {stats['added']}")
         print(f"  Updated: {stats['updated']}")
         print(f"  Skipped: {stats['skipped']}")
+        if stats['flagged']:
+            print(f"  Flagged: {stats['flagged']}")
         if stats['errors']:
             print(f"  Errors:  {stats['errors']}")
     else:
