@@ -127,6 +127,15 @@ class ObservationTest(unittest.TestCase):
         notes = list((self.vault / 'Movies').glob('*.md'))
         self.assertEqual([self.fm(n)['status'] for n in notes], ['to-watch'])
 
+    def test_created_to_watch_movie_gets_added_and_released(self):
+        def omdb(i):
+            return {**omdb_ok(i), 'released': pq.omdb_date('18 Oct 2013')}
+        with mock.patch.object(pq, 'omdb_full_fetch', omdb):
+            self.observe({'imdb_id': 'tt14', 'rating': None, 'in_watchlist': True}, source='watchlist')
+            self.run_processor()
+        fm = self.fm(next((self.vault / 'Movies').glob('*.md')))
+        self.assertEqual((fm['added'], fm['released']), (str(pq.date.today()), '2013-10-18'))
+
     def test_browsed_title_creates_nothing(self):
         self.observe({'imdb_id': 'tt6', 'rating': None, 'in_watchlist': False})
         self.run_processor()

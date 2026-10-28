@@ -124,6 +124,15 @@ def tvmaze_quick_lookup(imdb_id: str) -> dict | None:
 # OMDB full fetch (richer than the enrichment-only fetch in import.py)
 # ---------------------------------------------------------------------------
 
+def omdb_date(s: str) -> str:
+    """OMDB's "18 Oct 2013" as 2013-10-18, or '' when absent or unreadable."""
+    from datetime import datetime
+    try:
+        return datetime.strptime(s, '%d %b %Y').date().isoformat()
+    except ValueError:
+        return ''
+
+
 def omdb_full_fetch(imdb_id: str) -> dict:
     """Return all OMDB fields needed to create a note from scratch."""
     result = {'found': False}
@@ -156,6 +165,7 @@ def omdb_full_fetch(imdb_id: str) -> dict:
             'genres':      vi.parse_list(clean(data.get('Genre', ''))),
             'directors':   vi.parse_list(clean(data.get('Director', ''))),
             'runtime':     runtime_raw.replace(' min', '').strip(),
+            'released':    omdb_date(clean(data.get('Released', ''))),
             'language':    clean(data.get('Language', '')),
             'country':     clean(data.get('Country', '')),
             'rated':       clean(data.get('Rated', '')),
@@ -188,6 +198,10 @@ def _movie_fields(imdb_id: str, omdb: dict, my_rating: str, status: str, date_w:
         ('genres',           omdb.get('genres', [])),
         ('directors',        omdb.get('directors', [])),
         ('runtime',          omdb.get('runtime', '')),
+        # A watchlist add is seen when it happens, so today is its added date; a rating
+        # of a title never watchlisted has none.
+        ('added',            '' if my_rating else str(date.today())),
+        ('released',         omdb.get('released', '')),
         ('status',           status),
         ('language',         omdb.get('language', '')),
         ('country',          omdb.get('country', '')),

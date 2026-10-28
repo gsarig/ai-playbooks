@@ -421,6 +421,37 @@ def needs_omdb(fm: dict) -> bool:
 # Note builders
 # ---------------------------------------------------------------------------
 
+def watchlist_dates(row_wl: dict | None, row: dict) -> tuple[str, str]:
+    """(added, released): the day the title went on the watchlist ("Created", watchlist
+    export only) and its IMDB release date ("Release Date", both exports), as YYYY-MM-DD
+    or ''. The Watchlog dashboard's movie views sort and filter on them."""
+    def day(v):
+        v = (v or '').strip()[:10]
+        return v if re.match(r'^\d{4}-\d{2}-\d{2}$', v) else ''
+    return day((row_wl or {}).get('Created')), day(row.get('Release Date'))
+
+
+def backfill_dates(wl_rows: dict, existing: dict, dry_run: bool) -> int:
+    """--backfill-dates: fill empty added/released on existing movie notes from a
+    watchlist export. Writes nothing else, so an export of any age is safe here."""
+    filled = 0
+    for iid, row in wl_rows.items():
+        path = existing.get(iid)
+        if not path or path.parent.name != 'Movies':
+            continue
+        content = path.read_text(encoding='utf-8')
+        fm, _ = read_frontmatter(content)
+        new = {k: v for k, v in zip(('added', 'released'), watchlist_dates(row, row)) if v and not fm.get(k)}
+        if not new:
+            continue
+        for k, v in new.items():
+            content = update_field(content, k, v)
+        if not dry_run:
+            path.write_text(content, encoding='utf-8')
+        filled += 1
+    return filled
+
+
 def movie_fields(imdb_id, row_rt, row_wl, status, date_w) -> list:
     row = row_rt or row_wl
     _, type_val = TYPE_MAP.get(row.get('Title Type', '').strip(), ('Movies', 'movie'))
@@ -442,6 +473,8 @@ def movie_fields(imdb_id, row_rt, row_wl, status, date_w) -> list:
         ('genres',           parse_list(row.get('Genres', ''))),
         ('directors',        parse_list(row.get('Directors', ''))),
         ('runtime',          row.get('Runtime (mins)', '').strip()),
+        ('added',            watchlist_dates(row_wl, row)[0]),
+        ('released',         watchlist_dates(row_wl, row)[1]),
         ('status',           status),
         ('language',         ''),
         ('country',          ''),
@@ -583,6 +616,13 @@ def process(
         if date_w and str(fm.get('date_watched', '')) != date_w:
             updates['date_watched'] = date_w
             changed = True
+
+        # Watchlist dates fill once and are never overwritten
+        if not is_tv:
+            for key, val in zip(('added', 'released'), watchlist_dates(row_wl, row)):
+                if val and not fm.get(key):
+                    updates[key] = val
+                    changed = True
 
         # TVmaze refresh
         tvmaze_result = {}
@@ -852,6 +892,8 @@ def main() -> None:
                    help=f'Days before re-checking ongoing shows (default {DEFAULT_TTL})')
     p.add_argument('--tvmaze-only', action='store_true',
                    help='Refresh TVmaze fields on TV notes only; no CSVs, never touches ratings or status')
+    p.add_argument('--backfill-dates', action='store_true',
+                   help='Only fill empty added/released on movie notes from --watchlist; any export age')
     p.add_argument('--force-stale', action='store_true',
                    help=f'Import CSVs older than {STALE_CSV_HOURS} hours anyway')
     args = p.parse_args()
@@ -869,6 +911,12 @@ def main() -> None:
 
     if args.omdb and not os.environ.get('OMDB_API_KEY'):
         sys.exit('Error: --omdb requires OMDB_API_KEY in .env')
+
+    if args.backfill_dates:
+        path = args.watchlist or str(vault / 'imports' / 'watchlist.csv')
+        filled = backfill_dates(build_lookup(parse_csv(path)), scan_vault(vault), args.dry_run)
+        print(f'Backfilled added/released on {filled:,} movie notes{" (dry run)" if args.dry_run else ""}.')
+        return
 
     if args.tvmaze_only:
         stats = {'added': 0, 'updated': 0, 'skipped': 0, 'tvmaze_calls': 0, 'omdb_calls': 0, 'errors': 0}
