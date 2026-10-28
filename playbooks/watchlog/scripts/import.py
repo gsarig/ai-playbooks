@@ -44,6 +44,7 @@ TYPE_MAP = {
     "TV Movie":       ("Movies",   "tv-movie"),
     "Short":          ("Movies",   "short"),
     "Video":          ("Movies",   "video"),
+    "TV Special":     ("Movies",   "tv-special"),
     "TV Series":      ("TV Shows", "tv-series"),
     "TV Mini Series": ("TV Shows", "tv-miniseries"),
     "TV Episode":     ("TV Shows", None),
