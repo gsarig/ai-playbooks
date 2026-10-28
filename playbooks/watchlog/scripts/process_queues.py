@@ -589,6 +589,24 @@ def main() -> None:
     if args.dry_run:
         print('Dry run — no files will be written.')
 
+    # Reading every note takes about 20 seconds, so an idle run (the usual case, every 15
+    # minutes) stops before it.
+    queued, _ = read_queue(QUEUE_NOTE)
+    if not queued and not any((VAULT_ROOT / OBS_SUBDIR).glob('*.json')):
+        print('Nothing queued — nothing to do.')
+        return
+
+    # The cron run and the dashboard's Refresh button can start this at the same moment;
+    # two runs applying one file would create the same new note twice.
+    import fcntl
+    (VAULT_ROOT / OBS_SUBDIR).mkdir(parents=True, exist_ok=True)
+    lock = open(VAULT_ROOT / OBS_SUBDIR / '.lock', 'w')
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        print('Another run is in progress — leaving it to that one.')
+        return
+
     print('Scanning vault...')
     existing = vi.scan_vault(VAULT_ROOT)
     print(f'  Existing notes: {len(existing):,}')
