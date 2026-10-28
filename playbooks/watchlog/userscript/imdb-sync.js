@@ -215,7 +215,7 @@
       }
       if (rating === undefined && !unrated) continue;
       if (rating !== undefined && (rating < 1 || rating > 10)) continue;
-      const item = { imdb_id: m[1], rating: rating === undefined ? null : rating, in_watchlist: inWatchlist };
+      const item = { imdb_id: m[1], rating: rating === undefined ? null : rating, in_watchlist: inWatchlist, row: li };
       if (source === 'ratings') {
         const d = li.innerText.match(/Rated on ([A-Z][a-z]{2}) (\d{1,2}), (\d{4})/);
         if (d && MONTHS[d[1]]) item.rated_on = `${d[3]}-${pad(MONTHS[d[1]])}-${pad(+d[2])}`;
@@ -259,16 +259,16 @@
     }
   }
 
-  // Rows added by scrolling get their own tracker; a removal click shows up as a change on a trusted row.
+  // Trust belongs to a row element, not to a title. Changing the sort redraws the list without a page load, and the redrawn rows show the not-loaded state again; keyed by title, that would read as every title being unrated and removed. A redrawn row is a new element, so it starts untrusted. A removal click changes the same element, so it still counts.
   async function watchList(gen, source) {
-    const tracks = new Map();
+    const tracks = new WeakMap();
     while (gen === generation) {
       if (loggedIn()) {
         const now = Date.now();
         const ready = readRows(source).filter((i) => {
-          if (!tracks.has(i.imdb_id)) tracks.set(i.imdb_id, tracker());
-          return tracks.get(i.imdb_id)(i, now);
-        });
+          if (!tracks.has(i.row)) tracks.set(i.row, tracker());
+          return tracks.get(i.row)(i, now);
+        }).map(({ row, ...item }) => item);
         emit(source, ready);
       }
       await sleep(LIST_POLL_MS);
