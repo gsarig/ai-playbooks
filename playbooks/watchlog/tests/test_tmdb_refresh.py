@@ -78,6 +78,15 @@ class RefreshTest(unittest.TestCase):
         self.assertTrue(text.endswith('---\n\nPlot.\n'))
         self.assertEqual(stats['available'], 1)
 
+    def test_unavailable_gets_home_release(self):
+        with mock.patch.object(tr, 'home_release', return_value='2026-11-17') as hr:
+            _, text = self.run_on(note(), ('603', '', False))
+        self.assertIn('home_release: 2026-11-17', text)
+        hr.assert_called_once_with('603', 'k')
+        with mock.patch.object(tr, 'home_release') as hr:
+            _, text = self.run_on(note(), ('603', '', True))
+        hr.assert_not_called()
+
     def test_non_candidate_is_not_checked(self):
         stats, text = self.run_on(note(runtime='130'), ('603', '', True))
         self.assertNotIn('available', text)

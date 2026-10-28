@@ -6,7 +6,9 @@ For each Movies/ note with status to-watch that is an Easy watch candidate and i
 watched and writes three fields: `available` (true when any service in any country
 streams, rents, sells or shows it free or with ads), `tmdb_id` (saves the IMDB lookup on
 later runs) and `tmdb_checked` (the day). It also fills an empty `released` from TMDB's
-release date. Nothing else in the note is touched.
+release date and, for a movie not available yet, sets `home_release`: the earliest
+digital, DVD/Blu-ray or TV date TMDB lists in any country ('' when none is announced).
+Nothing else in the note is touched.
 
 Only availability separates an Easy watch candidate from an Easy watch movie, and an
 upcoming movie (released in the last UPCOMING_DAYS or later, not available yet) from a
@@ -44,6 +46,8 @@ UNAVAILABLE_TTL = 7
 AVAILABLE_TTL = 30
 RATE = 0.1          # seconds between requests, well under TMDB's limit
 PROVIDER_KINDS = ('flatrate', 'rent', 'buy', 'free', 'ads')
+# TMDB release types: 1 premiere, 2 limited theatrical, 3 theatrical, 4 digital, 5 physical, 6 TV.
+HOME_RELEASE_TYPES = (4, 5, 6)
 CANDIDATE_YEARS = 10
 RELEASE_WINDOW_DAYS = 90
 CANDIDATE_MIN_IMDB = 7.0
@@ -139,6 +143,15 @@ def lookup(imdb_id: str, tmdb_id: str, key: str) -> tuple[str, str, bool] | None
     return tmdb_id, release, available(providers)
 
 
+def home_release(tmdb_id: str, key: str) -> str:
+    """The earliest digital, physical or TV release date in any country, or ''."""
+    results = tmdb_get(f'movie/{tmdb_id}/release_dates', key).get('results') or []
+    time.sleep(RATE)
+    days = [r.get('release_date', '')[:10] for c in results for r in c.get('release_dates') or []
+            if r.get('type') in HOME_RELEASE_TYPES]
+    return min((d for d in days if d), default='')
+
+
 def refresh(vault: Path, key: str, dry_run: bool, limit: int | None, today: date | None = None) -> dict:
     today = today or date.today()
     stats = {'checked': 0, 'available': 0, 'not_found': 0, 'errors': 0, 'skipped': 0}
@@ -169,6 +182,8 @@ def refresh(vault: Path, key: str, dry_run: bool, limit: int | None, today: date
             updates.update({'tmdb_id': tmdb_id, 'available': 'true' if avail else 'false'})
             if release and not fm.get('released'):
                 updates['released'] = release
+            if not avail:
+                updates['home_release'] = home_release(tmdb_id, key)
             stats['available'] += avail
         if not dry_run:
             for k, v in updates.items():
