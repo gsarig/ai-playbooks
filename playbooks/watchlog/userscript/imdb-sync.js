@@ -13,9 +13,9 @@
   if (window.top !== window.self) return;
 
   const FOLDER = 'imdb';
-  const LOAD_WAIT_MS = 20000; // a page that has not shown your state by then records nothing
   const POLL_MS = 500;
-  const SETTLE_MS = 1500; // quiet time after DOM changes before re-reading
+  const LIST_POLL_MS = 1000; // list pages hold up to 250 rows per load
+  const SETTLE_MS = 1500; // a state must hold this long before it is written
 
   // ===================================================================================
   // Helpers
@@ -227,60 +227,52 @@
 
   const keyOf = (i) => `${i.rating}|${i.in_watchlist}`;
 
+  // "Unrated" and "Add to Watchlist" are also what IMDB shows BEFORE your data has loaded: on 2026-10-28 the first 25 rows of each list page were read that way, every one unrated and off the watchlist. So a title or row is trusted only once it has shown something that exists only after loading (a rating of yours, or "In Watchlist"); from then on every state it shows, and every change, is trusted. A title you neither rated nor watchlisted is therefore never reported, which costs nothing: there is nothing to record for it.
+  const loadedState = (i) => i.rating !== null || i.in_watchlist === true;
+
+  // Tracks one title's state across polls and decides when to report it: once trusted, and only after the same state has held for SETTLE_MS, so a half-loaded mix (rating shown, ribbon not yet) is never written.
+  function tracker() {
+    let trusted = false, key = null, since = 0, reported = null;
+    return (state, now) => {
+      if (!trusted && !loadedState(state)) return false;
+      trusted = true;
+      const k = keyOf(state);
+      if (k !== key) { key = k; since = now; return false; }
+      if (now - since < SETTLE_MS || k === reported) return false;
+      reported = k;
+      return true;
+    };
+  }
+
   // ===================================================================================
-  // Page watchers. `generation` stops a watcher once a client-side navigation leaves its page.
+  // Page watchers: poll for as long as the page is current. `generation` stops a watcher once a client-side navigation leaves its page.
   // ===================================================================================
 
   let generation = 0;
 
-  async function waitFor(gen, fn) {
-    const until = Date.now() + LOAD_WAIT_MS;
-    while (Date.now() < until) {
-      if (gen !== generation) return null;
-      const v = loggedIn() ? fn() : null;
-      if (v) return v;
+  async function watchTitle(gen, imdbId) {
+    const track = tracker();
+    while (gen === generation) {
+      const state = loggedIn() ? readTitle(imdbId) : null;
+      if (state && track(state, Date.now())) emit('title', [state]);
       await sleep(POLL_MS);
     }
-    return null;
   }
 
-  // Calls fn after the DOM has been quiet for SETTLE_MS, for as long as this page is current.
-  function onSettled(gen, fn) {
-    let timer = null;
-    const obs = new MutationObserver(() => {
-      if (gen !== generation) { obs.disconnect(); return; }
-      clearTimeout(timer);
-      timer = setTimeout(() => { if (gen === generation && loggedIn()) fn(); }, SETTLE_MS);
-    });
-    obs.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['aria-label', 'data-testid'] });
-  }
-
-  async function watchTitle(gen, imdbId) {
-    const first = await waitFor(gen, () => readTitle(imdbId));
-    if (!first) return;
-    let last = keyOf(first);
-    emit('title', [first]);
-    // Rating or un-watchlisting on the page itself shows up here.
-    onSettled(gen, () => {
-      const now = readTitle(imdbId);
-      if (now && keyOf(now) !== last) {
-        last = keyOf(now);
-        emit('title', [now]);
-      }
-    });
-  }
-
+  // Rows added by scrolling get their own tracker; a removal click shows up as a change on a trusted row.
   async function watchList(gen, source) {
-    const first = await waitFor(gen, () => { const r = readRows(source); return r.length ? r : null; });
-    if (!first) return;
-    const seen = new Map(first.map((i) => [i.imdb_id, keyOf(i)]));
-    emit(source, first);
-    // Rows added by scrolling, and ribbon changes such as a removal click.
-    onSettled(gen, () => {
-      const changed = readRows(source).filter((i) => seen.get(i.imdb_id) !== keyOf(i));
-      for (const i of changed) seen.set(i.imdb_id, keyOf(i));
-      emit(source, changed);
-    });
+    const tracks = new Map();
+    while (gen === generation) {
+      if (loggedIn()) {
+        const now = Date.now();
+        const ready = readRows(source).filter((i) => {
+          if (!tracks.has(i.imdb_id)) tracks.set(i.imdb_id, tracker());
+          return tracks.get(i.imdb_id)(i, now);
+        });
+        emit(source, ready);
+      }
+      await sleep(LIST_POLL_MS);
+    }
   }
 
   function route() {
