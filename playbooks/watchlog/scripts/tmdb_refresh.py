@@ -8,10 +8,14 @@ streams, rents, sells or shows it free or with ads), `tmdb_id` (saves the IMDB l
 later runs) and `tmdb_checked` (the day). It also fills an empty `released` from TMDB's
 release date. Nothing else in the note is touched.
 
-Only availability separates an Easy watch candidate from an Easy watch movie, so only
-candidates are checked: released within CANDIDATE_YEARS and at least RELEASE_WINDOW_DAYS
-ago, IMDb CANDIDATE_MIN_IMDB or higher, at most CANDIDATE_MAX_RUNTIME minutes. Keep them
-in step with any view that filters on `available`. A movie is due when it was never checked, when it is not available and was checked
+Only availability separates an Easy watch candidate from an Easy watch movie, and an
+upcoming movie (released in the last UPCOMING_DAYS or later, not available yet) from a
+watchable one, so only those two kinds are checked. Easy watch candidates are released
+within CANDIDATE_YEARS and at least RELEASE_WINDOW_DAYS ago, IMDb CANDIDATE_MIN_IMDB or
+higher, at most CANDIDATE_MAX_RUNTIME minutes. Keep them in step with any view that filters on
+`available`.
+
+A movie is due when it was never checked, when it is not available and was checked
 UNAVAILABLE_TTL days ago or more (it may reach streaming any week), or when it is
 available and was checked AVAILABLE_TTL days ago or more.
 
@@ -44,6 +48,7 @@ CANDIDATE_YEARS = 10
 RELEASE_WINDOW_DAYS = 90
 CANDIDATE_MIN_IMDB = 7.0
 CANDIDATE_MAX_RUNTIME = 100
+UPCOMING_DAYS = 365
 
 
 def _load_vault_import():
@@ -64,9 +69,23 @@ def available(providers: dict) -> bool:
     return any(isinstance(v, dict) and any(v.get(k) for k in PROVIDER_KINDS) for v in providers.values())
 
 
+def upcoming(fm: dict, today: date) -> bool:
+    """Not available anywhere yet, and released within UPCOMING_DAYS or still to come: a
+    film in cinemas or not out, as opposed to an old one that simply never reached a
+    service. Rechecked so it leaves the upcoming list once it can be watched."""
+    try:
+        released = date.fromisoformat(fm.get('released', '')[:10])
+    except ValueError:
+        return False
+    return fm.get('available') != 'true' and (today - released).days <= UPCOMING_DAYS
+
+
 def candidate(fm: dict, today: date) -> bool:
-    """Passes every Easy watch rule except availability. A movie with no release date,
-    runtime or rating is not one, as on the dashboard."""
+    """Worth a TMDB lookup: upcoming(), or passes every Easy watch rule except
+    availability. A movie with no release date, runtime or rating is not an Easy watch
+    candidate, as on the dashboard."""
+    if upcoming(fm, today):
+        return True
     try:
         released = date.fromisoformat(fm.get('released', '')[:10])
         runtime, rating = float(fm.get('runtime', '')), float(fm.get('imdb_rating', ''))

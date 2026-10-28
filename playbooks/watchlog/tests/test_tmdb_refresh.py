@@ -37,11 +37,19 @@ class RulesTest(unittest.TestCase):
         self.assertFalse(tr.available({}))
 
     def test_candidate_rules(self):
-        ok = {'released': '2024-01-01', 'runtime': '95', 'imdb_rating': '7.5'}
+        # available: true keeps upcoming() out of it, so only the Easy watch rules decide.
+        ok = {'released': '2024-01-01', 'runtime': '95', 'imdb_rating': '7.5', 'available': 'true'}
         self.assertTrue(tr.candidate(ok, TODAY))
         for change in ({'released': '2016-10-27'}, {'released': '2026-08-30'}, {'runtime': '101'},
                        {'imdb_rating': '6.9'}, {'released': ''}, {'runtime': ''}):
             self.assertFalse(tr.candidate({**ok, **change}, TODAY), change)
+
+    def test_upcoming_is_a_candidate_until_available(self):
+        long_new = {'released': '2026-07-17', 'runtime': '172', 'imdb_rating': '8.4', 'available': 'false'}
+        self.assertTrue(tr.candidate(long_new, TODAY))
+        self.assertTrue(tr.candidate({**long_new, 'released': '2026-12-01'}, TODAY))
+        self.assertFalse(tr.candidate({**long_new, 'available': 'true'}, TODAY))
+        self.assertFalse(tr.candidate({**long_new, 'released': '2024-01-01'}, TODAY))
 
     def test_due_ttls(self):
         self.assertTrue(tr.due({}, TODAY))
