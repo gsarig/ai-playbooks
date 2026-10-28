@@ -2,7 +2,7 @@
 
 Assumptions pinned: observation files are version-1 JSON, {"version": 1, "source": ...,
 "items": [{"imdb_id", "rating" (int or null), "in_watchlist" (bool), "rated_on"?}]},
-as userscript/imdb-sync.js writes them. Notes are found by their imdb_id frontmatter
+as userscript/imdb-capture.js writes them. Notes are found by their imdb_id frontmatter
 line. No network: the TVmaze and OMDB fetchers are stubbed, and sleeps are skipped.
 
 Run: python3 -m unittest discover -s tests

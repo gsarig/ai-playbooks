@@ -1,9 +1,9 @@
 /*
- * imdb-sync: records your IMDB rating and watchlist state for the titles you see, as JSON files in the Watchlog vault's `_data/imdb/` folder. scripts/process_queues.py (cron, every 15 minutes) applies them to the notes.  Loaded by userscript/stub.user.js through Tampermonkey's @require and re-read from disk on every page load.
+ * imdb-capture: records your IMDB rating and watchlist state for the titles you see, as JSON files in the Watchlog vault's `_data/imdb/` folder. scripts/process_queues.py (cron, every 15 minutes) applies them to the notes.  Loaded by userscript/stub.user.js through Tampermonkey's @require and re-read from disk on every page load.
  *
  * It only reads what the page already shows and writes files; it makes no requests and never clicks. It reports a state only when it is sure of it: you are logged in, and the page has finished loading your rating and watchlist state. A title missing from a list page is never read as "removed": only a row or title page that shows the state counts.
  *
- * What it keeps: the folder handle in imdb.com's IndexedDB (database `imdb-sync`, store `handles`). Nothing else is stored in the browser.
+ * What it keeps: the folder handle in imdb.com's IndexedDB (database `imdb-sync`, the script's first name, store `handles`). Nothing else is stored in the browser.
  *
  * Page markers, as seen on imdb.com in October 2026: the header's `imdbHeader-userMenuFlyoutLabel` (your name, absent when logged out); on a title page `hero-rating-bar__user-rating__score` ("9/10") or `hero-rating-bar__user-rating__unrated` ("Rate"), and `tm-box-wl-text` ("In Watchlist" / "Add to Watchlist"); on list rows the `poster-watchlist-ribbon-remove` / `-add` ribbon, `aria-label="Your rating: N"` or `"Rate <title>"`, and on the ratings page the text "Rated on Oct 23, 2026".
  */
@@ -88,6 +88,7 @@
 
   function openDb() {
     return new Promise((resolve, reject) => {
+      // Database and picker id keep the script's first name, imdb-sync, so the folder already picked under it survives the rename.
       const r = indexedDB.open('imdb-sync', 1);
       r.onupgradeneeded = () => r.result.createObjectStore('handles');
       r.onsuccess = () => resolve(r.result);
@@ -117,13 +118,13 @@
     const stored = await dbGet(FOLDER);
     if (stored) {
       if ((await stored.queryPermission({ mode: 'readwrite' })) === 'granted') return stored;
-      return ui.ask('IMDB sync needs permission for the folder watchlog/_data/imdb.', 'Allow', async () => {
+      return ui.ask('IMDB capture needs permission for the folder watchlog/_data/imdb.', 'Allow', async () => {
         const s = await stored.requestPermission({ mode: 'readwrite' });
         if (s !== 'granted') throw new Error(`permission ${s}; click again and allow`);
         return stored;
       });
     }
-    return ui.ask('IMDB sync: pick the folder watchlog/_data/imdb.', 'Pick folder', async () => {
+    return ui.ask('IMDB capture: pick the folder watchlog/_data/imdb.', 'Pick folder', async () => {
       const h = await window.showDirectoryPicker({ mode: 'readwrite', id: 'imdb-sync' });
       if (h.name !== FOLDER) throw new Error(`picked a folder named "${h.name}"; pick watchlog/_data/imdb`);
       await dbPut(FOLDER, h);
@@ -159,7 +160,7 @@
         const body = JSON.stringify({ version: 1, source, seen_at: localIso(now), items });
         await writeNew(dir, `${fileStamp(now)}_${source}.json`, body);
       } catch (e) {
-        ui.show(`IMDB sync: could not save (${errText(e)}).`, true);
+        ui.show(`IMDB capture: could not save (${errText(e)}).`, true);
       }
     });
   }

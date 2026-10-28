@@ -104,7 +104,7 @@ The queue processor runs `_Queue.md` automatically. To set it up:
 
 ### Step 6 — Install the IMDB userscript (recommended)
 
-`userscript/imdb-sync.js` records your IMDB ratings and watchlist changes as you browse, so you never export CSVs again. It runs in Edge or Chrome through [Tampermonkey](https://www.tampermonkey.net/). While you are logged in to IMDB, every title page you open, and every row on your watchlist and ratings pages, is saved as a small JSON file in `_data/imdb/`. It makes no requests, never clicks, and records nothing when you are logged out or the page has not finished loading your data. The queue cron job from step 5 applies the files within 15 minutes:
+`userscript/imdb-capture.js` records your IMDB ratings and watchlist changes as you browse, so you never export CSVs again. It runs in Edge or Chrome through [Tampermonkey](https://www.tampermonkey.net/). While you are logged in to IMDB, every title page you open, and every row on your watchlist and ratings pages, is saved as a small JSON file in `_data/imdb/`. It makes no requests, never clicks, and records nothing when you are logged out or the page has not finished loading your data. The queue cron job from step 5 applies the files within 15 minutes:
 
 - A rating sets `my_rating`; a movie becomes `watched`, a TV show follows the status logic below. `date_watched` is the "Rated on" date from your ratings page, or the day it was seen, and is never overwritten.
 - A title added to your watchlist that has no note yet is created as `to-watch`.
@@ -115,7 +115,7 @@ The queue processor runs `_Queue.md` automatically. To set it up:
 To install:
 
 1. Turn on Tampermonkey's "Allow access to file URLs" (the browser's extensions page, Tampermonkey, Details).
-2. Edit the `@require` line in `userscript/stub.user.js` to the absolute path of `userscript/imdb-sync.js` on your machine, then install the stub in Tampermonkey.
+2. Edit the `@require` line in `userscript/stub.user.js` to the absolute path of `userscript/imdb-capture.js` on your machine, then install the stub in Tampermonkey.
 3. Create the folder `_data/imdb` in the vault, open any IMDB title page, and pick that folder when the bottom-right button asks. A folder with any other name is refused.
 4. After each browser restart, the first IMDB page shows an "Allow" button once. Choose "Allow on every visit" to skip it.
 5. In Obsidian: Settings, Files and links, Excluded files, add `_data/`.
@@ -147,7 +147,7 @@ watchlog/
     _TV Shows Dashboard.md      TV-only stats and charts
   imports/                      drop IMDB CSV exports here (gitignored)
   _data/imdb/                   observation files from the userscript (gitignored)
-  userscript/                   Tampermonkey userscript: imdb-sync.js plus the stub you install
+  userscript/                   Tampermonkey userscript: imdb-capture.js plus the stub you install
   scripts/
     import.py                   bulk import and sync from IMDB CSV exports
     process_queues.py           queue processor

@@ -10,7 +10,7 @@ Each line is either:
   https://www.imdb.com/title/ttXXXXXXX/ :: 8      → add/update with rating
 
 Then applies the observation files the IMDB userscript writes to _data/imdb/
-(see process_observations and userscript/imdb-sync.js).
+(see process_observations and userscript/imdb-capture.js).
 
 Usage:
     python3 scripts/process_queues.py [--dry-run]
@@ -361,7 +361,7 @@ def apply_rating(note_path: Path, imdb_id: str, my_rating: str, date_w: str, sta
 
 
 # ---------------------------------------------------------------------------
-# Userscript observations (_data/imdb/*.json, written by userscript/imdb-sync.js)
+# Userscript observations (_data/imdb/*.json, written by userscript/imdb-capture.js)
 # ---------------------------------------------------------------------------
 
 OBS_SUBDIR      = Path('_data') / 'imdb'
