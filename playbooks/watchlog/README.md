@@ -200,7 +200,7 @@ To keep season dates current without any CSV, add a nightly cron job that re-che
 
 ### TMDB availability
 
-`scripts/tmdb_refresh.py` asks TMDB where each to-watch movie can be watched and writes `available: true` when any service in any country streams, rents, sells or shows it free, along with `tmdb_id` and `tmdb_checked`; it also fills an empty `released`. An unavailable movie is rechecked weekly and an available one monthly, so after the first run (about 1,000 movies, a few minutes) a nightly run only checks what is due. It needs `TMDB_API_KEY` in `.env`: a free key from TMDB's API settings, either the API Key or the Read Access Token. Where-to-watch data reaches TMDB from JustWatch, so anything showing it credits both.
+`scripts/tmdb_refresh.py` asks TMDB where each Easy watch candidate can be watched (a to-watch movie released in the last 10 years and at least 90 days ago, IMDb 7.0 or higher, at most 100 minutes) and writes `available: true` when any service in any country streams, rents, sells or shows it free, along with `tmdb_id` and `tmdb_checked`; it also fills an empty `released`. An unavailable movie is rechecked weekly and an available one monthly, so a nightly run only checks the few candidates that are due. It needs `TMDB_API_KEY` in `.env`: a free key from TMDB's API settings, either the API Key or the Read Access Token. Where-to-watch data reaches TMDB from JustWatch, so anything showing it credits both.
 
 ```
 35 23 * * * /usr/bin/python3 /absolute/path/to/watchlog/scripts/tmdb_refresh.py >> "$HOME/watchlog_tmdb.log" 2>&1

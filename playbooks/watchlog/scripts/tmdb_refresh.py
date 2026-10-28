@@ -2,13 +2,16 @@
 """
 TMDB availability refresh for to-watch movies (nightly cron).
 
-For each Movies/ note with status to-watch that is due, asks TMDB where the film can be
+For each Movies/ note with status to-watch that is an Easy watch candidate and is due, asks TMDB where the film can be
 watched and writes three fields: `available` (true when any service in any country
 streams, rents, sells or shows it free or with ads), `tmdb_id` (saves the IMDB lookup on
 later runs) and `tmdb_checked` (the day). It also fills an empty `released` from TMDB's
 release date. Nothing else in the note is touched.
 
-A movie is due when it was never checked, when it is not available and was checked
+Only availability separates an Easy watch candidate from an Easy watch movie, so only
+candidates are checked: released within CANDIDATE_YEARS and at least RELEASE_WINDOW_DAYS
+ago, IMDb CANDIDATE_MIN_IMDB or higher, at most CANDIDATE_MAX_RUNTIME minutes. Keep them
+in step with any view that filters on `available`. A movie is due when it was never checked, when it is not available and was checked
 UNAVAILABLE_TTL days ago or more (it may reach streaming any week), or when it is
 available and was checked AVAILABLE_TTL days ago or more.
 
@@ -37,6 +40,10 @@ UNAVAILABLE_TTL = 7
 AVAILABLE_TTL = 30
 RATE = 0.1          # seconds between requests, well under TMDB's limit
 PROVIDER_KINDS = ('flatrate', 'rent', 'buy', 'free', 'ads')
+CANDIDATE_YEARS = 10
+RELEASE_WINDOW_DAYS = 90
+CANDIDATE_MIN_IMDB = 7.0
+CANDIDATE_MAX_RUNTIME = 100
 
 
 def _load_vault_import():
@@ -55,6 +62,22 @@ class AuthError(Exception):
 def available(providers: dict) -> bool:
     """True when any country lists any way to watch: subscription, rent, buy, free or ads."""
     return any(isinstance(v, dict) and any(v.get(k) for k in PROVIDER_KINDS) for v in providers.values())
+
+
+def candidate(fm: dict, today: date) -> bool:
+    """Passes every Easy watch rule except availability. A movie with no release date,
+    runtime or rating is not one, as on the dashboard."""
+    try:
+        released = date.fromisoformat(fm.get('released', '')[:10])
+        runtime, rating = float(fm.get('runtime', '')), float(fm.get('imdb_rating', ''))
+    except ValueError:
+        return False
+    try:
+        oldest = today.replace(year=today.year - CANDIDATE_YEARS)
+    except ValueError:  # 29 February
+        oldest = today.replace(year=today.year - CANDIDATE_YEARS, day=28)
+    return (oldest <= released and (today - released).days >= RELEASE_WINDOW_DAYS
+            and rating >= CANDIDATE_MIN_IMDB and 0 < runtime <= CANDIDATE_MAX_RUNTIME)
 
 
 def due(fm: dict, today: date) -> bool:
@@ -106,7 +129,8 @@ def refresh(vault: Path, key: str, dry_run: bool, limit: int | None, today: date
         content = md.read_text(encoding='utf-8')
         fm, _ = vi.read_frontmatter(content)
         imdb_id = fm.get('imdb_id', '')
-        if fm.get('status') != 'to-watch' or not imdb_id.startswith('tt') or not due(fm, today):
+        if (fm.get('status') != 'to-watch' or not imdb_id.startswith('tt')
+                or not candidate(fm, today) or not due(fm, today)):
             stats['skipped'] += 1
             continue
         try:

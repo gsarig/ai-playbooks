@@ -24,8 +24,9 @@ spec.loader.exec_module(tr)
 TODAY = date(2026, 10, 28)
 
 
-def note(status='to-watch', extra=''):
-    return f'---\ntitle: Film\nimdb_id: tt1\nstatus: {status}\n{extra}---\n\nPlot.\n'
+def note(status='to-watch', extra='', released='2024-01-01', runtime='95', rating='7.5'):
+    return (f'---\ntitle: Film\nimdb_id: tt1\nstatus: {status}\nreleased: {released}\n'
+            f'runtime: {runtime}\nimdb_rating: {rating}\n{extra}---\n\nPlot.\n')
 
 
 class RulesTest(unittest.TestCase):
@@ -34,6 +35,13 @@ class RulesTest(unittest.TestCase):
         self.assertTrue(tr.available({'DE': {'ads': [{}]}}))
         self.assertFalse(tr.available({'GR': {'link': 'x'}}))
         self.assertFalse(tr.available({}))
+
+    def test_candidate_rules(self):
+        ok = {'released': '2024-01-01', 'runtime': '95', 'imdb_rating': '7.5'}
+        self.assertTrue(tr.candidate(ok, TODAY))
+        for change in ({'released': '2016-10-27'}, {'released': '2026-08-30'}, {'runtime': '101'},
+                       {'imdb_rating': '6.9'}, {'released': ''}, {'runtime': ''}):
+            self.assertFalse(tr.candidate({**ok, **change}, TODAY), change)
 
     def test_due_ttls(self):
         self.assertTrue(tr.due({}, TODAY))
@@ -54,18 +62,18 @@ class RefreshTest(unittest.TestCase):
                 stats = tr.refresh(vault, 'k', dry_run=False, limit=None, today=TODAY)
             return stats, md.read_text(encoding='utf-8')
 
-    def test_writes_only_tmdb_fields_and_empty_released(self):
-        stats, text = self.run_on(note(), ('603', '1999-03-31', True))
+    def test_writes_only_tmdb_fields(self):
+        stats, text = self.run_on(note(), ('603', '2023-12-25', True))
         fm = tr.vi.read_frontmatter(text)[0]
         self.assertEqual((fm['available'], fm['tmdb_id'], fm['tmdb_checked'], fm['released']),
-                         ('true', '603', '2026-10-28', '1999-03-31'))
+                         ('true', '603', '2026-10-28', '2024-01-01'))
         self.assertTrue(text.endswith('---\n\nPlot.\n'))
         self.assertEqual(stats['available'], 1)
 
-    def test_keeps_existing_released(self):
-        _, text = self.run_on(note(extra='released: 1999-01-01\n'), ('603', '1999-03-31', False))
-        fm = tr.vi.read_frontmatter(text)[0]
-        self.assertEqual((fm['released'], fm['available']), ('1999-01-01', 'false'))
+    def test_non_candidate_is_not_checked(self):
+        stats, text = self.run_on(note(runtime='130'), ('603', '', True))
+        self.assertNotIn('available', text)
+        self.assertEqual(stats['checked'], 0)
 
     def test_skips_watched_and_not_due(self):
         stats, text = self.run_on(note(status='watched'), ('603', '', True))
