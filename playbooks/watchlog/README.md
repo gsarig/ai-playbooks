@@ -187,6 +187,8 @@ watchlog/
 
 Run `--dry-run --limit 5` first to verify output before a full run.
 
+A full import also cross-checks the vault: a `to-watch` note whose title is in neither export becomes `removed`, which catches titles taken off the watchlist on the phone app or another browser. It is skipped with `--limit` and when the watchlist export is empty.
+
 The import refuses CSV files more than 24 hours old: with the userscript, notes can be newer than an old export, and importing it would roll their ratings and status back. Export fresh CSVs first, or pass `--force-stale` when you mean it.
 
 To keep season dates current without any CSV, add a nightly cron job that re-checks each running show at most once a week:

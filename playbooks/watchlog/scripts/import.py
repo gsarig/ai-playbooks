@@ -935,6 +935,24 @@ def main() -> None:
             print(f'  Error {iid}: {e}', file=sys.stderr)
             stats['errors'] += 1
 
+    # Both exports are complete lists, so a to-watch note in neither is a title taken off
+    # the watchlist somewhere the userscript never saw (the phone app, another browser).
+    # Skipped with --limit, where the lists are partial, and for an empty watchlist
+    # export, which is far likelier a failed export than an empty watchlist.
+    stats['removed'] = 0
+    if not args.limit and wl_map:
+        for iid, path in sorted(existing.items()):
+            if iid in rt_map or iid in wl_map:
+                continue
+            content = path.read_text(encoding='utf-8')
+            fm, _ = read_frontmatter(content)
+            if fm.get('status') != 'to-watch':
+                continue
+            print(f'  Removed from watchlist: {fm.get("title") or iid} ({iid})')
+            if not args.dry_run:
+                path.write_text(update_field(content, 'status', 'removed'), encoding='utf-8')
+            stats['removed'] += 1
+
     if not args.dry_run:
         write_standout(standout, vault)
         save_state(stats, vault)
@@ -943,6 +961,8 @@ def main() -> None:
     print(f'  Added:        {stats["added"]:,}')
     print(f'  Updated:      {stats["updated"]:,}')
     print(f'  Skipped:      {stats["skipped"]:,}')
+    if stats['removed']:
+        print(f'  Removed:      {stats["removed"]:,}')
     if stats['tvmaze_calls']:
         print(f'  TVmaze calls: {stats["tvmaze_calls"]:,}')
     if stats['omdb_calls']:
